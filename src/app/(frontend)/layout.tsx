@@ -1,18 +1,54 @@
-import React from 'react'
+// layout.tsx
+import { getPayload } from 'payload'
+import config from '@/payload.config'
+import { Header } from './components/Header'
+import { Footer } from './components/Footer'
+import localFont from 'next/font/local'
 import './styles.css'
 
+
+const courierPrime = localFont({
+  src: [
+    { path: '../../../public/fonts/CourierPrime-Regular.ttf', weight: '400', style: 'normal' },
+    { path: '../../../public/fonts/CourierPrime-Bold.ttf', weight: '700', style: 'normal' },
+  ],
+  variable: '--font-mono',
+  display: 'swap',
+})
+
+const helveticaNeue = localFont({
+  src: [
+    { path: '../../../public/fonts/HelveticaNeueRoman.otf', weight: '400', style: 'normal' },
+  ],
+  variable: '--font-display',
+  display: 'swap',
+})
+
 export const metadata = {
-  description: 'A blank template using Payload in a Next.js app.',
-  title: 'Payload Blank Template',
+  title: 'Praxis As It Is',
+  description: 'A living record of grassroots organising in Nigeria.',
 }
 
-export default async function RootLayout(props: { children: React.ReactNode }) {
-  const { children } = props
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const payloadConfig = await config
+  const payload = await getPayload({ config: payloadConfig })
+  const settings = await payload.findGlobal({ slug: 'site-settings' })
 
   return (
-    <html lang="en">
-      <body>
-        <main>{children}</main>
+    <html lang="en" className={`${courierPrime.variable} ${helveticaNeue.variable}`}>
+      <body className="bg-paper font-display text-ink antialiased">
+        <Header
+          nav={settings.nav ?? []}
+          siteName={settings.siteName ?? ''}
+          logoUrl={typeof settings.logo === 'object' ? (settings.logo?.url ?? undefined) : undefined}
+          socialLinks={settings.socialLinks ?? []}
+        />
+        {children}
+        <Footer
+          siteName={settings.siteName ?? ''}
+          logoUrl={typeof settings.logo === 'object' ? (settings.logo?.url ?? undefined) : undefined}
+          socialLinks={settings.socialLinks ?? []}
+        />
       </body>
     </html>
   )

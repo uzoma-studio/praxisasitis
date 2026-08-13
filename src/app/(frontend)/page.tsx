@@ -1,59 +1,47 @@
-import { headers as getHeaders } from 'next/headers.js'
-import Image from 'next/image'
+// src/app/(frontend)/page.tsx
 import { getPayload } from 'payload'
-import React from 'react'
-import { fileURLToPath } from 'url'
-
 import config from '@/payload.config'
-import './styles.css'
+
+import { Hero } from './components/Hero'
+import { FeaturedStories } from './components/FeaturedStories'
+import { RecentPosts } from './components/RecentPosts'
+import { MovementMapSnapshot } from './components/MovementMapSnapshot'
+import { FAQAccordion } from './components/FAQAccordion'
 
 export default async function HomePage() {
-  const headers = await getHeaders()
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
-  const { user } = await payload.auth({ headers })
 
-  const fileURL = `vscode://file/${fileURLToPath(import.meta.url)}`
+  const [featured, recent, tags, faqs, settings] = await Promise.all([
+    payload.find({
+      collection: 'posts',
+      where: { featured: { equals: true }, status: { equals: 'published' } },
+      limit: 3,
+    }),
+    payload.find({
+      collection: 'posts',
+      where: { status: { equals: 'published' } },
+      sort: '-dateStart',
+      limit: 6,
+    }),
+    payload.find({ collection: 'issue-tags', limit: 20 }),
+    payload.find({ collection: 'faq', sort: 'order', limit: 6 }),
+    payload.findGlobal({ slug: 'site-settings' }),
+  ])
 
   return (
-    <div className="home">
-      <div className="content">
-        <picture>
-          <source srcSet="https://raw.githubusercontent.com/payloadcms/payload/3.x/packages/ui/src/assets/payload-favicon.svg" />
-          <Image
-            alt="Payload Logo"
-            height={65}
-            src="https://raw.githubusercontent.com/payloadcms/payload/3.x/packages/ui/src/assets/payload-favicon.svg"
-            width={65}
-          />
-        </picture>
-        {!user && <h1>Welcome to your new project.</h1>}
-        {user && <h1>Welcome back, {user.email}</h1>}
-        <div className="links">
-          <a
-            className="admin"
-            href={payloadConfig.routes.admin}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Go to admin panel
-          </a>
-          <a
-            className="docs"
-            href="https://payloadcms.com/docs"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Documentation
-          </a>
-        </div>
-      </div>
-      <div className="footer">
-        <p>Update this page by editing</p>
-        <a className="codeLink" href={fileURL}>
-          <code>app/(frontend)/page.tsx</code>
-        </a>
-      </div>
-    </div>
+    <>
+      <Hero
+        tagline={settings.tagline}
+        introText={settings.introText}
+        illustrationUrl={
+          typeof settings.heroIllustration === 'object' ? settings.heroIllustration?.url : undefined
+        }
+      />
+      <FeaturedStories posts={featured.docs as any} />
+      <RecentPosts posts={recent.docs as any} />
+      <MovementMapSnapshot tags={tags.docs as any} highlight={featured.docs[0] as any} />
+      <FAQAccordion items={faqs.docs as any} />
+    </>
   )
 }
