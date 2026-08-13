@@ -45,11 +45,8 @@ Open `http://localhost:3000` for the site, and `http://localhost:3000/admin` for
 
 ### Collections
 
-- **Posts** — *brief description*
-- **Issue Tags** — *brief description*
-- **FAQ** — *brief description*
+- **Posts** 
+- **Issue Tags** 
+- **FAQ**
 - **Site Settings** (global) — logo, nav, social links, tagline, etc.
 
-## Deployment
-
-*Add your deployment steps here (e.g. Vercel + MongoDB Atlas, or Payload Cloud).*
