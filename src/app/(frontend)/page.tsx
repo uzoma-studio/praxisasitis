@@ -32,10 +32,12 @@ export default async function HomePage() {
   return (
     <>
       <Hero
-        tagline={settings.tagline}
-        introText={settings.introText}
+        tagline={settings.tagline ?? undefined}
+        introText={settings.introText ?? undefined}
         illustrationUrl={
-          typeof settings.heroIllustration === 'object' ? settings.heroIllustration?.url : undefined
+          typeof settings.heroIllustration === 'object'
+            ? (settings.heroIllustration?.url ?? undefined)
+            : undefined
         }
       />
       <FeaturedStories posts={featured.docs as any} />

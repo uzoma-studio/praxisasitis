@@ -178,7 +178,10 @@ export interface Media {
 export interface Post {
   id: number;
   title: string;
-  slug: string;
+  /**
+   * Leave blank to auto-generate from the title.
+   */
+  slug?: string | null;
   authorName: string;
   authorContact?: string | null;
   dateStart: string;
@@ -265,8 +268,11 @@ export interface Post {
 export interface IssueTag {
   id: number;
   name: string;
-  slug: string;
-  color: '#b8332f' | '#3f7d4f' | '#4f8fd6' | '#c78a2e';
+  /**
+   * Leave blank to auto-generate from the name.
+   */
+  slug?: string | null;
+  color: '#D10000' | '#00853F' | '#0095D9' | '#FCCA00' | '#A900B2';
   updatedAt: string;
   createdAt: string;
 }

@@ -1,5 +1,13 @@
 import type { CollectionConfig } from 'payload'
 
+const slugify = (text: string) =>
+  text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
 const minWords = (min: number) => (value: any) => {
   if (!value) return `This field is required.`
   const text = JSON.stringify(value)
@@ -21,10 +29,28 @@ export const Posts: CollectionConfig = {
       return { status: { equals: 'published' } }
     },
   },
+  hooks: {
+    beforeValidate: [
+      ({ data }) => {
+        if (data && !data.slug && data.title) {
+          data.slug = slugify(data.title)
+        }
+        return data
+      },
+    ],
+  },
   fields: [
     // 1. Title
     { name: 'title', type: 'text', required: true, label: 'Title' },
-    { name: 'slug', type: 'text', required: true, unique: true, index: true },
+    {
+      name: 'slug',
+      type: 'text',
+      unique: true,
+      index: true,
+      admin: {
+        description: 'Leave blank to auto-generate from the title.',
+      },
+    },
 
     // 2. Author name
     { name: 'authorName', type: 'text', required: true, label: 'Author name (real or pseudonym)' },
@@ -33,7 +59,7 @@ export const Posts: CollectionConfig = {
     {
       name: 'authorContact',
       type: 'text',
-      label: 'Author contact (email, WhatsApp, Telegram, or Signal)',
+      label: 'Author contact (email, Phone number)',
       access: { read: ({ req: { user } }) => Boolean(user) },
     },
 
@@ -45,7 +71,17 @@ export const Posts: CollectionConfig = {
     { name: 'locationDescription', type: 'text', required: true, label: 'Location description' },
 
     // 6. Geotag
-    { name: 'coordinates', type: 'point', required: true, label: 'Geotag (lat/long)' },
+    {
+      name: 'coordinates',
+      type: 'point',
+      required: true,
+      label: 'Geotag (lat/long)',
+      admin: {
+        components: {
+          Field: '/fields/GeoPointField#GeoPointField',
+        },
+      },
+    },
 
     // 7. Scale
     {
