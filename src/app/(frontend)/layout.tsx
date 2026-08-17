@@ -6,7 +6,6 @@ import { Footer } from './components/Footer'
 import localFont from 'next/font/local'
 import './styles.css'
 
-
 const courierPrime = localFont({
   src: [
     { path: '../../../public/fonts/CourierPrime-Regular.ttf', weight: '400', style: 'normal' },
@@ -17,9 +16,7 @@ const courierPrime = localFont({
 })
 
 const helveticaNeue = localFont({
-  src: [
-    { path: '../../../public/fonts/HelveticaNeueRoman.otf', weight: '400', style: 'normal' },
-  ],
+  src: [{ path: '../../../public/fonts/HelveticaNeueRoman.otf', weight: '400', style: 'normal' }],
   variable: '--font-display',
   display: 'swap',
 })
@@ -35,18 +32,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const settings = await payload.findGlobal({ slug: 'site-settings' })
 
   return (
-    <html lang="en" className={`${courierPrime.variable} ${helveticaNeue.variable}`}>
-      <body className="bg-paper font-display text-ink antialiased">
+    <html lang="en" className={`${courierPrime.variable} ${helveticaNeue.variable} bg-paper-dark`}>
+      <body className="flex min-h-screen flex-col bg-paper font-display text-ink antialiased">
         <Header
           nav={settings.nav ?? []}
           siteName={settings.siteName ?? ''}
-          logoUrl={typeof settings.logo === 'object' ? (settings.logo?.url ?? undefined) : undefined}
+          logoUrl={
+            typeof settings.logo === 'object' ? (settings.logo?.url ?? undefined) : undefined
+          }
           socialLinks={settings.socialLinks ?? []}
         />
-        {children}
+        <main className="flex-1">{children}</main>
         <Footer
           siteName={settings.siteName ?? ''}
-          logoUrl={typeof settings.logo === 'object' ? (settings.logo?.url ?? undefined) : undefined}
+          logoUrl={
+            typeof settings.logo === 'object' ? (settings.logo?.url ?? undefined) : undefined
+          }
           socialLinks={settings.socialLinks ?? []}
         />
       </body>

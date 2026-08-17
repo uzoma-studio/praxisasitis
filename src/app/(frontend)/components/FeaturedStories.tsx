@@ -4,20 +4,38 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'motion/react'
+import { HiArrowRight } from 'react-icons/hi'
 
 type Post = {
   id: string
   title: string
   slug: string
-  excerpt?: string
+  whatDidWeDo?: any // Lexical richText JSON from Payload
   dateStart: string
   media?: { url?: string }[]
   issueTags?: { name: string }[]
-  location?: string
+  locationDescription?: string
 }
 
 const SCROLL_AMOUNT = 280
-const HOOK_WIDTH = 11 // matches your ArchiveRolodex $hook-width
+const HOOK_WIDTH = 11
+
+// Walks Lexical's JSON tree and pulls out plain text, for a short preview —
+// not a full rich-text render, just enough for the "What did we do?" excerpt.
+function lexicalToPlainText(content: any): string {
+  if (!content?.root?.children) return ''
+  let text = ''
+  function walk(nodes: any[]) {
+    for (const node of nodes) {
+      if (node.type === 'text' && node.text) {
+        text += node.text + ' '
+      }
+      if (node.children) walk(node.children)
+    }
+  }
+  walk(content.root.children)
+  return text.trim()
+}
 
 export function FeaturedStories({ posts }: { posts: Post[] }) {
   const [current, setCurrent] = useState(0)
@@ -33,6 +51,7 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
   const scrollStartX = useRef(0)
 
   const active = posts[current]
+  const activeExcerpt = active ? lexicalToPlainText(active.whatDidWeDo) : ''
 
   const updateHookPosition = useCallback(() => {
     const wrapper = wrapperRef.current
@@ -107,7 +126,7 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
     <section id="featured" className="border-b border-ink px-6 py-12">
       <div className="mb-10 flex items-center justify-between">
         <h2 className="text-lg font-mono font-bold uppercase tracking-wide">Featured Stories</h2>
-        <div className="hidden md:flex gap-2 text-xs">
+        <div className="hidden gap-2 text-xs md:flex">
           <button
             onClick={() => scrollBy(-1)}
             disabled={!canScrollLeft}
@@ -127,13 +146,11 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
         </div>
       </div>
 
-      {/* Outer wrapper: relative positioning context for the hook, which now
-          lives OUTSIDE the scrollable row so it's never clipped by overflow. */}
       <div ref={wrapperRef} className="relative grid grid-cols-1 border border-ink md:grid-cols-3">
         {/* Left: preview panel, synced with the active card */}
         <Link
           href={active ? `/archive/${active.slug}` : '#'}
-          className="relative col-span-1 block border-b border-ink bg-ink/5 md:border-b-0 md:border-r"
+          className="relative col-span-1 flex flex-col border-b border-ink bg-ink/5 md:h-full md:border-b-0 md:border-r"
         >
           <AnimatePresence mode="wait">
             {active && (
@@ -143,6 +160,7 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
+                className="flex h-full flex-col"
               >
                 {active.media?.[0]?.url && (
                   <Image
@@ -153,19 +171,26 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
                     className="h-64 w-full object-cover md:h-72"
                   />
                 )}
-                <div className="bg-paper p-4">
-                  <p className="text-[10px] uppercase text-ink/60">{active.issueTags?.[0]?.name}</p>
-                  <h3 className="mt-1 text-lg font-mono pr-6 font-bold leading-tight">
-                    {active.title}
-                  </h3>
-                  {active.excerpt && (
-                    <p className="mt-2 text-xs leading-relaxed opacity-70">
-                      {active.excerpt.slice(0, 140)}...
+                <div className="flex flex-1 flex-col justify-between bg-white p-4">
+                  <div>
+                    <p className="text-[10px] uppercase text-ink/60">
+                      {active.issueTags?.[0]?.name}
                     </p>
-                  )}
-                  <div className="mt-4 flex items-center justify-between text-[10px] uppercase">
+                    <h3 className="mt-1 pt-6 pb-2 pr-6 font-mono text-lg font-bold leading-tight">
+                      {active.title}
+                    </h3>
+                    {activeExcerpt && (
+                      <p className="mt-2 pb-8 pr-6 text-sm leading-tight opacity-70">
+                        {activeExcerpt.slice(0, 140)}
+                        {activeExcerpt.length > 140 ? '...' : ''}
+                      </p>
+                    )}
+                  </div>
+                  <div className="mt-4 pr-4 flex items-center justify-between text-[10px] uppercase">
                     <span>{new Date(active.dateStart).toLocaleDateString()}</span>
-                    <span>Explore →</span>
+                    <div className="flex items-center gap-2">
+                      <span className="pt-1">Explore</span> <HiArrowRight size={12} />
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -173,14 +198,15 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
           </AnimatePresence>
         </Link>
 
-        {/* Right: scrollable card row */}
+        {/* Right: scrollable row on desktop, stacked list on mobile. Also
+            goes full-width when there's no image (drops to its own row). */}
         <div
           ref={sliderRef}
           onMouseDown={onMouseDown}
           onMouseMove={onMouseMove}
           onMouseUp={stopDrag}
           onMouseLeave={stopDrag}
-          className="col-span-1 flex cursor-grab overflow-x-auto md:col-span-2"
+          className="col-span-1 flex flex-col md:col-span-2 md:flex-row md:cursor-grab md:overflow-x-auto"
           style={{ scrollbarWidth: 'none' }}
         >
           {posts.map((post, i) => (
@@ -190,24 +216,25 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
                 cardRefs.current[i] = el
               }}
               onClick={() => setCurrent(i)}
-              className={`relative flex min-w-full w-full flex-col cursor-pointer justify-between border-r border-ink p-6 text-left transition-colors last:border-r-0 md:min-w-[33.333%] md:w-[33.333%] ${
+              className={` relative flex cursor-pointer h-30 w-full flex-col items-start justify-between border-b border-ink p-4 text-left transition-colors last:border-b-0 md:h-auto md:min-w-[33.333%] md:w-[33.333%] md:flex-col md:justify-between md:border-b-0 md:border-r md:p-6 md:last:border-r-0 ${
                 i === current
                   ? 'bg-praxisgreen text-white'
-                  : ' text-ink hover:bg-praxisgreen hover:text-white'
+                  : 'bg-paper text-ink hover:bg-praxisgreen hover:text-white'
               }`}
             >
-              <p className="text-[10px] uppercase opacity-70">{post.issueTags?.[0]?.name}</p>
-              <h3 className="mt-6 text-sm py-20 font-mono font-bold leading-tight">{post.title}</h3>
-              <span className="mt-6 text-[10px] uppercase opacity-60">
-                {post.location ?? 'Nigeria'}
+              <div className="flex flex-col md:contents ">
+                <p className="text-[10px] pt-2 uppercase opacity-70">{post.issueTags?.[0]?.name}</p>
+                <h3 className="text-sm font-mono font-bold leading-tight md:mt-6 md:py-20 mt-1 md:text-sm">
+                  {post.title}
+                </h3>
+              </div>
+              <span className="text-[9px] uppercase opacity-60 md:mt-6 md:text-[10px]">
+                {post.locationDescription ?? 'Nigeria'}
               </span>
             </button>
           ))}
         </div>
 
-        {/* The hook itself — a sibling of the panel and row, positioned via
-            measured pixel coordinates, so it's never subject to the scroll
-            container's clipping and always sits exactly on the true seam. */}
         {hookLeft !== null && (
           <motion.span
             animate={{ left: hookLeft }}

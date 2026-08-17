@@ -1,7 +1,7 @@
 'use client'
 
 import { Fragment, useRef } from 'react'
-import { motion, useScroll, useTransform } from 'motion/react'
+import { motion, useTransform, useScroll } from 'motion/react'
 import { HiArrowRight } from 'react-icons/hi'
 import { InteractiveHeroImage } from './InteractiveHeroImage'
 
@@ -65,14 +65,19 @@ export function Hero({
         {/* Right: illustration — desktop only */}
         {illustrationUrl && (
           <motion.div
-            initial={{ opacity: 0, y: -30, scale: 0.9, rotate: 0 }}
-            animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
-            whileHover={{ rotate: -6, scale: 1.05, y: -6 }}
+            initial={{ opacity: 0, y: -30, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.1 }}
             className="pointer-events-auto relative z-10 hidden justify-self-center md:flex md:w-[380px] lg:w-[420px]"
           >
-            <InteractiveHeroImage src={illustrationUrl!} alt="" />
+            <motion.div
+              animate={{ y: [0, -12, 0] }}
+              whileHover={{ y: 0 }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <InteractiveHeroImage src={illustrationUrl} alt="" />
+            </motion.div>
           </motion.div>
         )}
       </div>
@@ -83,12 +88,17 @@ export function Hero({
           style={{ y: parallaxY }}
           initial={{ opacity: 0, scale: 0.9, rotate: 8 }}
           animate={{ opacity: 0.9, scale: 1, rotate: 18 }}
-          whileHover={{ rotate: 26, scale: 1.06 }}
           whileTap={{ scale: 0.95 }}
           transition={{ type: 'spring', stiffness: 180, damping: 14, delay: 0.25 }}
           className="pointer-events-auto absolute left-[40%] top-[62%] hidden w-[380px] -translate-x-1/2 md:block lg:w-[420px]"
         >
-          <InteractiveHeroImage src={illustrationUrl!} alt="" />
+          <motion.div
+            animate={{ y: [0, -8, 0] }}
+            whileHover={{ y: 0 }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
+          >
+            <InteractiveHeroImage src={illustrationUrl} alt="" />
+          </motion.div>
         </motion.div>
       )}
 
@@ -101,7 +111,12 @@ export function Hero({
           transition={{ type: 'spring', stiffness: 190, damping: 14, delay: 0.2 }}
           className="pointer-events-auto relative z-10 mx-auto mt-0 w-[300px] md:hidden"
         >
-          <InteractiveHeroImage src={illustrationUrl!} alt="" />
+          <motion.div
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+          >
+            <InteractiveHeroImage src={illustrationUrl!} alt="" />
+          </motion.div>
         </motion.div>
       )}
     </section>
