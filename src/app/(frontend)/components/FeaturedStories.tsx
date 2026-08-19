@@ -149,7 +149,7 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
       <div ref={wrapperRef} className="relative grid grid-cols-1 border border-ink md:grid-cols-3">
         {/* Left: preview panel, synced with the active card */}
         <Link
-          href={active ? `/archive/${active.slug}` : '#'}
+          href={active ? `/archives/${active.slug}` : '#'}
           className="relative col-span-1 flex flex-col border-b border-ink bg-ink/5 md:h-full md:border-b-0 md:border-r"
         >
           <AnimatePresence mode="wait">

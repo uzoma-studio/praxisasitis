@@ -46,7 +46,7 @@ export function Hero({
 
           <div className="mt-8 flex items-center gap-6">
             <a
-              href="/posts/new"
+              href="/add-post"
               className="rounded-md bg-ink px-5 py-3 text-xs font-bold uppercase tracking-wide text-paper transition-opacity hover:opacity-80"
             >
               Add a Post

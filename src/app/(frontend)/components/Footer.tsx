@@ -85,8 +85,8 @@ export function Footer({
       <div className="flex flex-col items-center gap-4 px-6 py-8 text-[11px] font-bold uppercase tracking-wide md:flex-row md:justify-between md:gap-0">
         <a href="/about">About</a>
         <a href="/map">Map</a>
-        <a href="/archive">Archive</a>
-        <a href="/posts/new">Add a Post</a>
+        <a href="/archives">Archive</a>
+        <a href="/add-post">Add a Post</a>
         <p className="font-normal text-black normal-case ">
           © {new Date().getFullYear()} {siteName.replace(/\s+/g, '')}
         </p>

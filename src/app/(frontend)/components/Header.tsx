@@ -17,6 +17,13 @@ const socialIcon: Record<string, IconType> = {
   youtube: SiYoutube,
 }
 
+// Guards against a nav href stored without a leading slash — without this,
+// a value like "map" resolves *relative to the current page*, so it opens
+// correctly from "/" but breaks into "/archives/map" from a page like
+// "/archives/[slug]". See SiteSettings' field-level validation for the
+// data-side half of this fix.
+const normalizeHref = (href: string) => (href.startsWith('/') ? href : `/${href}`)
+
 const menuVariants: any = {
   hidden: { clipPath: 'inset(0 0 100% 0)' },
   visible: {
@@ -85,14 +92,14 @@ export function Header({
           isAddPost(item) ? (
             <a
               key={item.href}
-              href={item.href}
+              href={normalizeHref(item.href)}
               className="flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-paper transition-opacity hover:opacity-80"
             >
               <span className="text-sm leading-none">+</span>
               {item.label}
             </a>
           ) : (
-            <a key={item.href} href={item.href}>
+            <a key={item.href} href={normalizeHref(item.href)}>
               {item.label}
             </a>
           ),
@@ -163,7 +170,7 @@ export function Header({
               {nav.map((item, i) => (
                 <motion.a
                   key={item.href}
-                  href={item.href}
+                  href={normalizeHref(item.href)}
                   variants={itemVariants}
                   onClick={() => setOpen(false)}
                   className="group flex items-baseline gap-3 border-b border-ink/10 py-4 font-display text-4xl font-bold uppercase tracking-tight text-ink transition-colors active:text-ink/60"

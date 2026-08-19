@@ -267,7 +267,7 @@ export function RecentPosts({ posts }: { posts: Post[] }) {
                           )}
 
                           <Link
-                            href={`/posts/${activePost.slug}`}
+                            href={`/archives/${activePost.slug}`}
                             className="mt-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide"
                           >
                             Explore
