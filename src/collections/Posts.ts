@@ -21,7 +21,12 @@ export const Posts: CollectionConfig = {
   slug: 'posts',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'status', 'scale', 'issueTags', 'dateStart'],
+
+    defaultColumns: ['title', 'authorName', 'status', 'scale', 'issueTags', 'dateStart'],
+
+    components: {
+      beforeList: ['/components/admin/PostsStatusTabs#PostsStatusTabs'],
+    },
   },
   access: {
     read: ({ req: { user } }) => {
@@ -143,7 +148,24 @@ export const Posts: CollectionConfig = {
       name: 'status',
       type: 'select',
       defaultValue: 'draft',
-      options: ['draft', 'pending-review', 'published', 'rejected'],
+      options: [
+        {
+          label: 'Draft',
+          value: 'draft',
+        },
+        {
+          label: 'Pending Review',
+          value: 'pending-review',
+        },
+        {
+          label: 'Published',
+          value: 'published',
+        },
+        {
+          label: 'Rejected',
+          value: 'rejected',
+        },
+      ],
     },
     { name: 'locationSensitive', type: 'checkbox', label: 'Hide precise location publicly' },
   ],
