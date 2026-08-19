@@ -1,3 +1,4 @@
+import { ViewPublishedPost as ViewPublishedPost_0fd0020ff7a530f4d23926782d398f97 } from '../../../components/admin/ViewPublishedPost'
 import { GeoPointField as GeoPointField_d1c28dee0a2e0799d404cff41e0eb34c } from '../../../fields/GeoPointField'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -27,6 +28,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "/components/admin/ViewPublishedPost#ViewPublishedPost": ViewPublishedPost_0fd0020ff7a530f4d23926782d398f97,
   "/fields/GeoPointField#GeoPointField": GeoPointField_d1c28dee0a2e0799d404cff41e0eb34c,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,

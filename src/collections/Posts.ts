@@ -54,6 +54,9 @@ export const Posts: CollectionConfig = {
       index: true,
       admin: {
         description: 'Leave blank to auto-generate from the title.',
+        components: {
+          afterInput: ['/components/admin/ViewPublishedPost#ViewPublishedPost'],
+        },
       },
     },
 

@@ -200,7 +200,7 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
   }
 
   return (
-    <main className="min-h-screen bg-paper px-6 py-26 text-ink lg:px-[9vw]">
+    <main className="min-h-screen bg-paper px-6 py-26 text-ink lg:px-0">
       <AnimatePresence>
         {(formError || successMessage) && (
           <motion.div
@@ -471,6 +471,13 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
           </aside>
         </form>
       </div>
+
+      <section className="border-t border-ink px-6 mt-16 pt-16 text-center">
+        <p className="font-mono lg:text-6xl text-2xl font-black uppercase tracking-wide">
+          Tell No Lies, Claim <br />
+          No Easy Victory
+        </p>
+      </section>
     </main>
   )
 }
