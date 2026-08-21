@@ -62,19 +62,21 @@ export function FAQAccordion({ items }: { items: FAQItem[] }) {
             <motion.div
               key={openItem.id}
               initial={{ width: 0 }}
-              animate={{ width: 400 }}
+              animate={{ width: 460 }}
               exit={{ width: 0 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="absolute inset-y-0 right-0 z-10 hidden overflow-hidden rounded-lg bg-ink md:block"
+              className="absolute -inset-y-8 right-0 z-10 hidden overflow-hidden rounded-lg bg-ink md:block"
             >
-              <div className="flex h-full w-[380px] flex-col p-8 text-paper">
-                <span className="font-mono text-4xl font-bold opacity-90">
+              <div className="flex h-full w-[440px] flex-col p-8 text-paper">
+                <span className="font-mono text-4xl font-bold opacity-90 shrink-0">
                   {String(openIndex + 1).padStart(2, '0')}
                 </span>
-                <h3 className="mt-4 text-base font-mono font-bold leading-tight">
+                <h3 className="mt-4 text-base font-mono font-bold leading-tight shrink-0">
                   {openItem.question}
                 </h3>
-                <p className="mt-2 text-sm leading-tight text-paper/80">{openItem.answer}</p>
+                <div className="mt-2 flex-1 min-h-0 overflow-y-auto pr-2 -mr-2">
+                  <p className="text-sm leading-relaxed text-paper/80">{openItem.answer}</p>
+                </div>
               </div>
             </motion.div>
           )}
