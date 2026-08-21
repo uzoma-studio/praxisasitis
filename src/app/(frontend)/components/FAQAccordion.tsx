@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-
 type FAQItem = { id: string; question: string; answer: string }
 
 export function FAQAccordion({ items }: { items: FAQItem[] }) {
@@ -65,7 +64,7 @@ export function FAQAccordion({ items }: { items: FAQItem[] }) {
               animate={{ width: 460 }}
               exit={{ width: 0 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="absolute -inset-y-8 right-0 z-10 hidden overflow-hidden rounded-lg bg-ink md:block"
+              className="absolute -inset-y-8 right-0 z-10 hidden overflow-hidden rounded-lg bg-ink md:block "
             >
               <div className="flex h-full w-[440px] flex-col p-8 text-paper">
                 <span className="font-mono text-4xl font-bold opacity-90 shrink-0">
