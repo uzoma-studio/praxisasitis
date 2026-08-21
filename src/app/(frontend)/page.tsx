@@ -8,6 +8,7 @@ import { RecentPosts } from './components/RecentPosts'
 import { FAQAccordion } from './components/FAQAccordion'
 import { richTextToPlainText, truncateWords } from '@/lib/richText'
 import { MovementMap } from './components/MovementMapLoader'
+export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
   const payloadConfig = await config
