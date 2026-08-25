@@ -426,7 +426,13 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
             </button>
           </div>
 
-          <aside className="lg:pt-3">
+          {/* On mobile this grid is a single column, so items stack by DOM
+              order — order-first moves the image upload block above the
+              fields (and the submit button, which lives at the end of the
+              fields div) on small screens. lg:order-none reverts to normal
+              source order once the two-column desktop grid kicks in, so
+              desktop is unaffected. */}
+          <aside className="order-first lg:order-none lg:pt-3">
             <div>
               <div className="relative">
                 <label className="block cursor-pointer">

@@ -337,7 +337,7 @@ export function MovementMap({ tags, posts, variant = 'snapshot' }: MovementMapPr
       className={
         isFull
           ? 'relative isolate h-[calc(100vh-120px)] min-h-[500px] lg:h-full lg:min-h-0'
-          : 'relative isolate h-[470px] overflow-hidden rounded-lg border border-ink'
+          : 'relative isolate h-[470px] overflow-hidden border border-ink'
       }
     >
       <MapContainer
@@ -439,14 +439,14 @@ export function MovementMap({ tags, posts, variant = 'snapshot' }: MovementMapPr
 
   if (!isFull) {
     return (
-      <section className="border-ink px-6 py-12">
-        <h2 className="mb-10 pt-2 font-mono text-lg font-bold uppercase tracking-wide">
+      <section className="border-ink lg:px-6 px-0 py-12">
+        <h2 className="mb-10 pt-2 lg:px-0 px-6 font-mono text-lg font-bold uppercase tracking-wide">
           Movement Map
         </h2>
 
         {mapEl}
 
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-4 flex lg:px-0 px-6 flex-wrap gap-2">
           <button
             onClick={() => setActiveTags([])}
             className={`rounded-full border border-ink px-3 py-1 text-[10px] font-semibold uppercase ${
@@ -487,7 +487,10 @@ export function MovementMap({ tags, posts, variant = 'snapshot' }: MovementMapPr
           })}
         </div>
 
-        <Link href="/map" className="mt-10 inline-block text-xs font-semibold uppercase underline">
+        <Link
+          href="/map"
+          className="lg:px-0 px-6  mt-10 inline-block text-xs font-semibold uppercase underline"
+        >
           Open full map →
         </Link>
       </section>
