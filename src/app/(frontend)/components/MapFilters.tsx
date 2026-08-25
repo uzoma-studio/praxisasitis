@@ -36,6 +36,8 @@ type MapFiltersProps = {
   dateRange: [number, number]
   setDateRange: Dispatch<SetStateAction<[number, number]>>
 
+  applyDatePreset: (days: number | 'all') => void
+
   exportCSV: () => void
   exportGeoJSON: () => void
 
@@ -52,6 +54,8 @@ type MapFiltersProps = {
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
+type DatePreset = '1w' | '1m' | 'all'
+
 export function MapFilters({
   tags,
   activeTags,
@@ -63,6 +67,7 @@ export function MapFilters({
   dateBounds,
   dateRange,
   setDateRange,
+  applyDatePreset,
   exportCSV,
   exportGeoJSON,
   onDone,
@@ -71,12 +76,24 @@ export function MapFilters({
   const minYear = new Date(dateBounds.min).getFullYear()
   const maxYear = new Date(dateBounds.max).getFullYear()
 
-  // The slider now works directly in the underlying timestamps (day-level
-  // steps), not whole years — that's what removes the "jumping" feel, since
-  // there are now thousands of stops between min and max instead of a
-  // handful of year-sized ones. Years are only used for the label above it.
+  // The slider itself works directly in the underlying timestamps
+  // (day-level steps), not whole years — that's what keeps dragging feeling
+  // smooth, since there are thousands of stops between min and max instead
+  // of a handful of year-sized ones. Years are only used for the label
+  // above it.
   function handleSliderChange(value: [number, number]) {
+    setActivePreset(null)
     setDateRange(value)
+  }
+
+  // Tracks which preset button (if any) matches the current range, purely
+  // for the active/highlighted button state — reset to null whenever the
+  // person drags the slider manually, since no preset applies anymore.
+  const [activePreset, setActivePreset] = useState<DatePreset | null>('all')
+
+  function handlePreset(preset: DatePreset) {
+    setActivePreset(preset)
+    applyDatePreset(preset === 'all' ? 'all' : preset === '1w' ? 7 : 30)
   }
 
   function toggleTag(name: string) {
@@ -208,6 +225,38 @@ export function MapFilters({
               onChange={handleSliderChange}
               step={DAY_MS}
             />
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              onClick={() => handlePreset('1w')}
+              className={`rounded-full border border-ink px-2.5 py-1 text-[10px] font-semibold uppercase transition-colors ${
+                activePreset === '1w' ? 'bg-ink text-paper' : 'hover:bg-ink/10'
+              }`}
+            >
+              Last week
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handlePreset('1m')}
+              className={`rounded-full border border-ink px-2.5 py-1 text-[10px] font-semibold uppercase transition-colors ${
+                activePreset === '1m' ? 'bg-ink text-paper' : 'hover:bg-ink/10'
+              }`}
+            >
+              Last month
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handlePreset('all')}
+              className={`rounded-full border border-ink px-2.5 py-1 text-[10px] font-semibold uppercase transition-colors ${
+                activePreset === 'all' ? 'bg-ink text-paper' : 'hover:bg-ink/10'
+              }`}
+            >
+              All time
+            </button>
           </div>
         </div>
       )}
