@@ -122,7 +122,7 @@ function TabRow({
       viewBox={`0 ${-TOP_BUFFER} ${patternWidth} ${ROW_H + TOP_BUFFER}`}
       preserveAspectRatio="none"
       className="w-full"
-      style={{ height: ROW_H + TOP_BUFFER }}
+      style={{ aspectRatio: `${patternWidth} / ${ROW_H + TOP_BUFFER}` }}
     >
       {/* Shaded plateau for the active tab, drawn beneath the line */}
       {activeIndex !== -1 && (
@@ -187,13 +187,15 @@ function TabRow({
                 onClick={() => onSelect(post.id)}
                 onMouseEnter={() => setHoveredId(post.id)}
                 onMouseLeave={() => setHoveredId(null)}
-                className="flex h-full cursor-pointer items-start gap-2 px-4 pt-6"
+                className="flex h-full cursor-pointer items-start gap-2 lg:px-4 px-2 pt-4"
               >
                 <span
                   className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
                   style={{ backgroundColor: post.issueTags?.[0]?.color ?? '#999' }}
                 />
-                <span className="font-mono text-xs font-bold leading-snug">{post.title}</span>
+                <span className="font-mono lg:text-sm text-base font-bold leading-tight">
+                  {post.title}
+                </span>
               </div>
             </foreignObject>
           </g>

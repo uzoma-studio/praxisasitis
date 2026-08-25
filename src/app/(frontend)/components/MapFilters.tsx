@@ -1,6 +1,6 @@
 'use client'
 
-import type { Dispatch, SetStateAction } from 'react'
+import { useState, type Dispatch, type SetStateAction } from 'react'
 
 type IssueTag = {
   id: string
@@ -36,8 +36,6 @@ type MapFiltersProps = {
   dateRange: [number, number]
   setDateRange: Dispatch<SetStateAction<[number, number]>>
 
-  applyDatePreset: (days: number | 'all') => void
-
   exportCSV: () => void
   exportGeoJSON: () => void
 
@@ -65,25 +63,31 @@ export function MapFilters({
   dateBounds,
   dateRange,
   setDateRange,
-  applyDatePreset,
   exportCSV,
   exportGeoJSON,
   onDone,
   DualRangeSlider,
 }: MapFiltersProps) {
+  const minYear = new Date(dateBounds.min).getFullYear()
+  const maxYear = new Date(dateBounds.max).getFullYear()
+
+  // The slider now works directly in the underlying timestamps (day-level
+  // steps), not whole years — that's what removes the "jumping" feel, since
+  // there are now thousands of stops between min and max instead of a
+  // handful of year-sized ones. Years are only used for the label above it.
+  function handleSliderChange(value: [number, number]) {
+    setDateRange(value)
+  }
+
   function toggleTag(name: string) {
     setActiveTags((prev) =>
-      prev.includes(name)
-        ? prev.filter((tag) => tag !== name)
-        : [...prev, name],
+      prev.includes(name) ? prev.filter((tag) => tag !== name) : [...prev, name],
     )
   }
 
   function toggleScale(scale: Scale) {
     setActiveScales((prev) =>
-      prev.includes(scale)
-        ? prev.filter((item) => item !== scale)
-        : [...prev, scale],
+      prev.includes(scale) ? prev.filter((item) => item !== scale) : [...prev, scale],
     )
   }
 
@@ -93,13 +97,9 @@ export function MapFilters({
       {onDone && (
         <div className="flex items-center justify-between border-b border-ink pb-5">
           <div>
-            <p className="font-mono text-sm font-bold uppercase">
-              Filters
-            </p>
+            <p className="font-mono text-sm font-bold uppercase">Filters</p>
 
-            <p className="mt-1 text-[10px] uppercase opacity-60">
-              Refine movement records
-            </p>
+            <p className="mt-1 text-[10px] uppercase opacity-60">Refine movement records</p>
           </div>
 
           <button
@@ -115,9 +115,7 @@ export function MapFilters({
 
       {/* SEARCH */}
       <div>
-        <label className="mb-2 block text-[10px] font-semibold uppercase opacity-70">
-          Search
-        </label>
+        <label className="mb-2 block text-[10px] font-semibold uppercase opacity-70">Search</label>
 
         <input
           value={search}
@@ -129,9 +127,7 @@ export function MapFilters({
 
       {/* ISSUES */}
       <div>
-        <p className="mb-2 text-[10px] font-semibold uppercase opacity-70">
-          Issues
-        </p>
+        <p className="mb-2 text-[10px] font-semibold uppercase opacity-70">Issues</p>
 
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => {
@@ -169,9 +165,7 @@ export function MapFilters({
 
       {/* SCALE */}
       <div>
-        <p className="mb-2 text-[10px] font-semibold uppercase opacity-70">
-          Scale
-        </p>
+        <p className="mb-2 text-[10px] font-semibold uppercase opacity-70">Scale</p>
 
         <div className="flex flex-col gap-1.5">
           {(Object.keys(SCALE_LABELS) as Scale[]).map((scale) => {
@@ -194,45 +188,26 @@ export function MapFilters({
       </div>
 
       {/* DATE */}
-      {dateBounds.min !== dateBounds.max && (
+      {minYear !== maxYear && (
         <div>
-          <p className="mb-2 text-[10px] font-semibold uppercase opacity-70">
-            {new Date(dateRange[0]).toLocaleDateString()} –{' '}
-            {new Date(dateRange[1]).toLocaleDateString()}
+          <p className="mb-2 text-[10px] font-semibold uppercase opacity-70">Date range</p>
+
+          <p className="mb-3 font-mono text-sm font-bold">
+            {new Date(dateRange[0]).getFullYear()} – {new Date(dateRange[1]).getFullYear()}
           </p>
 
-          <DualRangeSlider
-            min={dateBounds.min}
-            max={dateBounds.max}
-            value={dateRange}
-            onChange={setDateRange}
-            step={DAY_MS}
-          />
-
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            <button
-              type="button"
-              onClick={() => applyDatePreset(7)}
-              className="rounded-full border border-ink px-2.5 py-1 text-[10px] font-semibold uppercase"
-            >
-              Last week
-            </button>
-
-            <button
-              type="button"
-              onClick={() => applyDatePreset(30)}
-              className="rounded-full border border-ink px-2.5 py-1 text-[10px] font-semibold uppercase"
-            >
-              Last month
-            </button>
-
-            <button
-              type="button"
-              onClick={() => applyDatePreset('all')}
-              className="rounded-full border border-ink px-2.5 py-1 text-[10px] font-semibold uppercase"
-            >
-              All time
-            </button>
+          {/* px-2 gives the thumbs room to sit inside the track at the
+              0%/100% extremes — each thumb is centered on its position
+              with -translate-x-1/2, so at the very ends half of it would
+              otherwise hang off the edge of the panel. */}
+          <div className="px-2">
+            <DualRangeSlider
+              min={dateBounds.min}
+              max={dateBounds.max}
+              value={dateRange}
+              onChange={handleSliderChange}
+              step={DAY_MS}
+            />
           </div>
         </div>
       )}
@@ -242,7 +217,7 @@ export function MapFilters({
         <button
           type="button"
           onClick={exportCSV}
-          className="flex-1 border border-ink px-3 py-2 text-[10px] font-semibold uppercase"
+          className="flex-1 border border-ink px-3 py-2 cursor-pointer text-[10px] font-semibold uppercase transition-colors hover:bg-ink hover:text-paper"
         >
           Export CSV
         </button>
@@ -250,7 +225,7 @@ export function MapFilters({
         <button
           type="button"
           onClick={exportGeoJSON}
-          className="flex-1 border border-ink px-3 py-2 text-[10px] font-semibold uppercase"
+          className="flex-1 border border-ink px-3 py-2 cursor-pointer text-[10px] font-semibold uppercase transition-colors hover:bg-ink hover:text-paper"
         >
           Export GeoJSON
         </button>
