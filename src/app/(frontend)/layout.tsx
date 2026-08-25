@@ -8,8 +8,8 @@ import './styles.css'
 
 const courierPrime = localFont({
   src: [
-    { path: '../../../public/fonts/CourierPrime-Regular.ttf', weight: '400', style: 'normal' },
-    { path: '../../../public/fonts/CourierPrime-Bold.ttf', weight: '700', style: 'normal' },
+    { path: '../../../public/fonts/SpaceMono-Regular.ttf', weight: '400', style: 'normal' },
+    { path: '../../../public/fonts/SpaceMono-Bold.ttf', weight: '700', style: 'normal' },
   ],
   variable: '--font-mono',
   display: 'swap',

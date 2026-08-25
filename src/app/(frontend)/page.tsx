@@ -18,7 +18,7 @@ export default async function HomePage() {
     payload.find({
       collection: 'posts',
       where: { featured: { equals: true }, status: { equals: 'published' } },
-      limit: 3,
+      limit: 6,
     }),
     payload.find({
       collection: 'posts',
