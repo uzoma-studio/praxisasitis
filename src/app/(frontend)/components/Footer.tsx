@@ -4,6 +4,7 @@ import { motion } from 'motion/react'
 import { SiX, SiInstagram, SiFacebook, SiTiktok, SiYoutube } from 'react-icons/si'
 import type { IconType } from 'react-icons'
 
+type NavItem = { label: string; href: string }
 type SocialLink = { platform: string; url: string }
 
 const socialIcon: Record<string, IconType> = {
@@ -14,11 +15,19 @@ const socialIcon: Record<string, IconType> = {
   youtube: SiYoutube,
 }
 
+// Guards against a nav href stored without a leading slash — without this,
+// a value like "map" resolves *relative to the current page*, so it opens
+// correctly from "/" but breaks into "/archives/map" from a page like
+// "/archives/[slug]". Kept in sync with Header's normalizeHref.
+const normalizeHref = (href: string) => (href.startsWith('/') ? href : `/${href}`)
+
 export function Footer({
+  nav,
   siteName,
   logoUrl,
   socialLinks,
 }: {
+  nav: NavItem[]
   siteName: string
   logoUrl?: string
   socialLinks?: SocialLink[]
@@ -83,10 +92,11 @@ export function Footer({
 
       {/* Bottom: nav + copyright */}
       <div className="flex flex-col items-center gap-4 px-6 py-8 text-[11px] font-bold uppercase tracking-wide md:flex-row md:justify-between md:gap-0">
-        <a href="/about">About</a>
-        <a href="/map">Map</a>
-        <a href="/archives">Archive</a>
-        <a href="/add-post">Add a Post</a>
+        {(nav ?? []).map((item) => (
+          <a key={item.href} href={normalizeHref(item.href)}>
+            {item.label}
+          </a>
+        ))}
         <p className="font-normal text-black normal-case ">
           © {new Date().getFullYear()} {siteName.replace(/\s+/g, '')}
         </p>
