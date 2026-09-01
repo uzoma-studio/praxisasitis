@@ -1,19 +1,18 @@
 import L from 'leaflet'
 
-// Centered on Lagos, zoomed out enough to show most of Nigeria.
+// Centered on Lagos, zoomed to fill more of the frame with Nigeria.
 export const MAP_CENTER: [number, number] = [6.5244, 3.3792]
-export const DEFAULT_ZOOM = 6
+export const DEFAULT_ZOOM = 7
 
 // Fallback used whenever a post has no issue tags / no tag color set.
 export const DEFAULT_ACCENT = '#b23b2e'
 
-// CartoDB Positron, full variant — pale peach landmass, muted blue water,
-// plus roads, rivers, and place labels baked into the tiles.
-// Standard OpenStreetMap tiles — free, no key, no account, ever.
-export const TILE_URL = 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png'
+// Standard OpenStreetMap tiles — free, no API key, no signup, works with
+// a plain L.tileLayer() call. Same format as your original CARTO setup,
+// just pointed at OSM's own servers instead of a third-party renderer.
+export const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
 export const TILE_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
-  '&copy; <a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>'
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 
 export function markerIcon(color: string) {
   return L.divIcon({
