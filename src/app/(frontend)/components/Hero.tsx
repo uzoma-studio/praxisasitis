@@ -3,7 +3,7 @@
 import { Fragment, useRef } from 'react'
 import { motion, useTransform, useScroll } from 'motion/react'
 import { HiArrowRight } from 'react-icons/hi'
-import { InteractiveHeroImage } from './InteractiveHeroImage'
+import { PolaroidStack } from './PolaroidStack'
 
 export function Hero({
   tagline,
@@ -62,9 +62,10 @@ export function Hero({
           </div>
         </div>
 
-        {/* Right: illustration — desktop only */}
+        {/* Right: polaroid stack — desktop only */}
         {illustrationUrl && (
           <motion.div
+            style={{ y: parallaxY }}
             initial={{ opacity: 0, y: -30, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             whileTap={{ scale: 0.97 }}
@@ -72,50 +73,30 @@ export function Hero({
             className="pointer-events-auto relative z-10 hidden justify-self-center md:flex md:w-[380px] lg:w-[420px]"
           >
             <motion.div
+              className="lg:mt-6"
               animate={{ y: [0, -12, 0] }}
-              whileHover={{ y: 0 }}
               transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             >
-              <InteractiveHeroImage src={illustrationUrl} alt="" />
+              <PolaroidStack src={illustrationUrl} alt="" />
             </motion.div>
           </motion.div>
         )}
       </div>
 
-      {/* Second folder — tilted right (toppling), shifted left, desktop only */}
-      {illustrationUrl && (
-        <motion.div
-          style={{ y: parallaxY }}
-          initial={{ opacity: 0, scale: 0.9, rotate: 8 }}
-          animate={{ opacity: 0.9, scale: 1, rotate: 18 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 180, damping: 14, delay: 0.25 }}
-          className="pointer-events-auto absolute left-[40%] top-[62%] hidden w-[380px] -translate-x-1/2 md:block lg:w-[420px]"
-        >
-          <motion.div
-            animate={{ y: [0, -8, 0] }}
-            whileHover={{ y: 0 }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
-          >
-            <InteractiveHeroImage src={illustrationUrl} alt="" />
-          </motion.div>
-        </motion.div>
-      )}
-
-      {/* Mobile-only folder — single, centered */}
+      {/* Mobile-only polaroid stack — single, centered */}
       {illustrationUrl && (
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           whileTap={{ scale: 0.92, rotate: -3 }}
           transition={{ type: 'spring', stiffness: 190, damping: 14, delay: 0.2 }}
-          className="pointer-events-auto relative z-10 mx-auto mt-0 w-[300px] md:hidden"
+          className="pointer-events-auto relative z-10 mx-auto mt-10 py-10 mb-10 w-[280px] md:hidden"
         >
           <motion.div
             animate={{ y: [0, -8, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
           >
-            <InteractiveHeroImage src={illustrationUrl!} alt="" />
+            <PolaroidStack src={illustrationUrl} alt="" />
           </motion.div>
         </motion.div>
       )}

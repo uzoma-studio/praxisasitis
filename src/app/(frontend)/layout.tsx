@@ -44,6 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
         <main className="flex-1">{children}</main>
         <Footer
+          nav={settings.nav ?? []}
           siteName={settings.siteName ?? ''}
           logoUrl={
             typeof settings.logo === 'object' ? (settings.logo?.url ?? undefined) : undefined

@@ -9,9 +9,11 @@ export const DEFAULT_ACCENT = '#b23b2e'
 
 // CartoDB Positron, full variant — pale peach landmass, muted blue water,
 // plus roads, rivers, and place labels baked into the tiles.
-export const TILE_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+// Standard OpenStreetMap tiles — free, no key, no account, ever.
+export const TILE_URL = 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png'
 export const TILE_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> '
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+  '&copy; <a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>'
 
 export function markerIcon(color: string) {
   return L.divIcon({
