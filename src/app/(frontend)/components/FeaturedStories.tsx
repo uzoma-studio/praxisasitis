@@ -203,7 +203,7 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
                     )}
                   </div>
                   <div className="mt-4 pr-4 flex items-center justify-between text-[10px] uppercase">
-                    <span>{new Date(active.dateStart).toLocaleDateString()}</span>
+                    <span>{new Date(active.dateStart).toLocaleDateString('en-US')}</span>
                     <div className="flex items-center gap-2">
                       <span className="pt-1">Explore</span> <HiArrowRight size={12} />
                     </div>
@@ -300,7 +300,7 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
                             )}
                           </div>
                           <div className="mt-4 pr-4 flex items-center justify-between text-[10px] uppercase">
-                            <span>{new Date(active.dateStart).toLocaleDateString()}</span>
+                            <span>{new Date(active.dateStart).toLocaleDateString('en-US')}</span>
                             <div className="flex items-center gap-2">
                               <span className="pt-1">Explore</span> <HiArrowRight size={12} />
                             </div>
