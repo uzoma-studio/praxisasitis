@@ -22,6 +22,14 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    meta: {
+      titleSuffix: ' - Praxis',
+    },
+    components: {
+      graphics: {
+        Logo: '/components/admin/Logo#Logo',
+      },
+    },
   },
 
   collections: [Users, Media, Posts, FAQ, IssueTags],
