@@ -19,6 +19,7 @@ import {
 } from '@/lib/map-shared'
 import { HiArrowRight } from 'react-icons/hi'
 import { MapFilters } from './MapFilters'
+import { HoverText } from './HoverText'
 
 type IssueTag = {
   id: string
@@ -440,10 +441,11 @@ export function MovementMap({ tags, posts, variant = 'snapshot' }: MovementMapPr
   if (!isFull) {
     return (
       <section className="border-ink lg:px-6 px-0 py-12">
-        <h2 className="mb-10 pt-2 lg:px-0 px-6 font-mono text-lg font-bold uppercase tracking-wide">
-          Movement Map
-        </h2>
-
+        <HoverText
+          as="h2"
+          text="Movement Map"
+          className="mb-10 pt-2 lg:px-0 px-6 font-mono text-lg font-bold uppercase tracking-wide"
+        />
         {mapEl}
 
         <div className="mt-4 flex lg:px-0 px-6 flex-wrap gap-2">

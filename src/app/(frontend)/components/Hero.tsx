@@ -1,9 +1,10 @@
 'use client'
 
-import { Fragment, useRef } from 'react'
+import { useRef } from 'react'
 import { motion, useTransform, useScroll } from 'motion/react'
 import { HiArrowRight } from 'react-icons/hi'
 import { PolaroidStack } from './PolaroidStack'
+import { HoverText } from './HoverText'
 
 export function Hero({
   tagline,
@@ -31,17 +32,18 @@ export function Hero({
       <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2">
         {/* Left: text content */}
         <div className="relative z-10 max-w-xl">
-          <h1 className="font-mono text-4xl font-bold uppercase leading-[1.05] tracking-tight md:text-5xl lg:text-6xl">
-            {(tagline ?? '').split('\n').map((line, i) => (
-              <Fragment key={i}>
-                {line}
-                <br />
-              </Fragment>
-            ))}
-          </h1>
+          <HoverText
+            as="h1"
+            text={tagline ?? ''}
+            className="font-mono text-4xl font-bold uppercase leading-[1.05] tracking-tight md:text-5xl lg:text-6xl"
+          />
 
           {introText && (
-            <p className="mt-6 max-w-md text-sm leading-relaxed opacity-80">{introText}</p>
+            <HoverText
+              as="p"
+              text={introText}
+              className="mt-6 max-w-md text-sm leading-relaxed opacity-80"
+            />
           )}
 
           <div className="mt-8 flex items-center gap-6">
