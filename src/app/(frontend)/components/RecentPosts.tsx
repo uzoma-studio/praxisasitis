@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'motion/react'
 import { HiArrowRight } from 'react-icons/hi'
+import { HoverText } from './HoverText'
 
 type Post = {
   id: string
@@ -218,9 +219,11 @@ export function RecentPosts({ posts }: { posts: Post[] }) {
 
   return (
     <section className=" border-ink py-20">
-      <h2 className="mb-22 pt-4  text-center font-mono text-lg font-bold uppercase tracking-wide">
-        Recent Stories
-      </h2>
+      <HoverText
+        as="h2"
+        text=" Recent Stories"
+        className="mb-22 pt-4  text-center font-mono text-lg font-bold uppercase tracking-wide"
+      />
 
       <div className="w-full">
         {rows.map((row, rowIndex) => {
