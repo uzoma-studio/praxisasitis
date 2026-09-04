@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'motion/react'
 import { HiArrowRight } from 'react-icons/hi'
+import { HoverText } from './HoverText'
 
 type Post = {
   id: string
@@ -139,7 +140,11 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
   return (
     <section id="featured" className="border-b border-ink px-6 py-12">
       <div className="mb-10 flex items-center justify-between">
-        <h2 className="text-lg font-mono font-bold uppercase tracking-wide">Featured Stories</h2>
+        <HoverText
+          as="h2"
+          text="Featured Stories"
+          className="text-lg font-mono font-bold uppercase tracking-wide"
+        />
         <div className="hidden gap-2 text-xs md:flex">
           <button
             onClick={() => scrollBy(-1)}
@@ -192,9 +197,11 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
                     <p className="text-[10px] uppercase text-ink/60">
                       {active.issueTags?.[0]?.name}
                     </p>
-                    <h3 className="mt-1 pt-6 pb-2 pr-6 font-mono text-lg font-bold leading-tight">
-                      {active.title}
-                    </h3>
+                    <HoverText
+                      as="h3"
+                      text={active.title}
+                      className="mt-1 pt-6 pb-2 pr-6 font-mono text-lg font-bold leading-tight"
+                    />
                     {activeExcerpt && (
                       <p className="mt-2 pb-8 pr-6 text-sm leading-tight opacity-70">
                         {activeExcerpt.slice(0, 140)}
@@ -289,9 +296,11 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
                             <p className="text-[10px] uppercase text-ink/60">
                               {active.issueTags?.[0]?.name}
                             </p>
-                            <h3 className="mt-1 pt-6 pb-2 pr-6 font-mono text-lg font-bold leading-tight">
-                              {active.title}
-                            </h3>
+                            <HoverText
+                              as="h3"
+                              text={active.title}
+                              className="mt-1 pt-6 pb-2 pr-6 font-mono text-lg font-bold leading-tight"
+                            />
                             {activeExcerpt && (
                               <p className="mt-2 pb-8 pr-6 text-sm leading-tight opacity-70">
                                 {activeExcerpt.slice(0, 140)}

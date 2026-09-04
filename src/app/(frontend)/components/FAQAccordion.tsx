@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
+import { HoverText } from './HoverText'
 type FAQItem = { id: string; question: string; answer: string }
 
 export function FAQAccordion({ items }: { items: FAQItem[] }) {
@@ -10,7 +11,11 @@ export function FAQAccordion({ items }: { items: FAQItem[] }) {
 
   return (
     <section className="py-12">
-      <h2 className="px-6 mb-10 text-2xl font-mono font-bold uppercase tracking-wide">FAQ</h2>
+      <HoverText
+        as="h2"
+        text="FAQ"
+        className="px-6 mb-10 text-2xl font-mono font-bold uppercase tracking-wide"
+      />
 
       <div className="relative border-y divide-y divide-accent border-accent">
         {items.map((item, i) => {
