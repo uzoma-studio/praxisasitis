@@ -31,7 +31,12 @@ export function Hero({
     >
       <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2">
         {/* Left: text content */}
-        <div className="relative z-10 max-w-xl">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="relative z-10 max-w-xl"
+        >
           <HoverText
             as="h1"
             text={tagline ?? ''}
@@ -62,7 +67,7 @@ export function Hero({
               <HiArrowRight size={14} />
             </a>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right: polaroid stack — desktop only */}
         {illustrationUrl && (
