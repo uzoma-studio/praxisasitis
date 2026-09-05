@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion, AnimatePresence, type Variants } from 'motion/react'
 import { HiArrowRight } from 'react-icons/hi'
 import { HoverText } from './HoverText'
 
@@ -29,6 +29,16 @@ const Y_TOP = 6 // plateau y (small inset so stroke isn't clipped)
 const Y_BASE = ROW_H - 6 // baseline y
 const HOVER_LIFT = 8 // how much higher the hovered tab's plateau sits, in SVG units
 const TOP_BUFFER = 14 // extra headroom above the row so the lifted plateau isn't clipped
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+}
+
+const rowFadeInUp: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+}
 
 function useColumns() {
   const [columns, setColumns] = useState(3)
@@ -218,7 +228,13 @@ export function RecentPosts({ posts }: { posts: Post[] }) {
   const activePost = posts.find((p) => p.id === activeId) ?? null
 
   return (
-    <section className=" border-ink py-20">
+    <motion.section
+      className=" border-ink py-20"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+      variants={fadeInUp}
+    >
       <HoverText
         as="h2"
         text=" Recent Stories"
@@ -230,7 +246,13 @@ export function RecentPosts({ posts }: { posts: Post[] }) {
           const rowContainsActive = row.some((p) => p.id === activeId)
 
           return (
-            <div key={rowIndex}>
+            <motion.div
+              key={rowIndex}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.4 }}
+              variants={rowFadeInUp}
+            >
               <TabRow
                 posts={row}
                 activeId={activeId}
@@ -261,9 +283,11 @@ export function RecentPosts({ posts }: { posts: Post[] }) {
 
                       <div className="grid grid-cols-1 gap-8 bg-paper-dark  rounded-xl py-8 md:grid-cols-[1fr_1fr] md:items-center">
                         <div>
-                          <h3 className="font-mono text-xl font-bold leading-tight lg:max-w-md md:text-2xl">
-                            {activePost.title}
-                          </h3>
+                          <HoverText
+                            as="h2"
+                            text={activePost.title}
+                            className="font-mono text-xl font-bold leading-tight lg:max-w-md md:text-2xl"
+                          />
 
                           {activePost.excerpt && (
                             <p className="mt-4 mb-6 max-w-md text-sm leading-tight opacity-80">
@@ -295,10 +319,10 @@ export function RecentPosts({ posts }: { posts: Post[] }) {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </motion.div>
           )
         })}
       </div>
-    </section>
+    </motion.section>
   )
 }

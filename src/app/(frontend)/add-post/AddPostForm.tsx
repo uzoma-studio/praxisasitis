@@ -3,6 +3,7 @@
 import { FormEvent, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { AnimatePresence, motion } from 'motion/react'
+import { HoverText } from '../components/HoverText'
 
 // LocationPicker touches window/document via Leaflet at import time, so it
 // can't be part of the server-rendered pass. AddPostForm is already a
@@ -479,10 +480,11 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
       </div>
 
       <section className="border-t border-ink px-6 mt-16 pt-16 text-center">
-        <p className="font-mono lg:text-6xl text-2xl font-black uppercase tracking-wide">
-          Tell No Lies, Claim <br />
-          No Easy Victory
-        </p>
+        <HoverText
+          as="p"
+          text={'Tell No Lies, Claim\nNo Easy Victory'}
+          className="font-mono lg:text-6xl text-2xl font-black uppercase tracking-wide"
+        />
       </section>
     </main>
   )
