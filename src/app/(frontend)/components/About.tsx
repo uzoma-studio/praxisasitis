@@ -1,13 +1,28 @@
+'use client'
+
 import type { ReactNode } from 'react'
+import { motion, type Variants } from 'motion/react'
 import type { AboutData, QuoteExplainBlock } from '../about/about-content'
 import { ScrollFillText } from './ScrollFillText'
 import { CollapsibleSections } from '../components/CollapsibleSections'
+import { HoverText } from './HoverText'
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+}
 
 // Local helper, not exported — used for the two quote+explanation sections
 // (openingQuote, problemClosingQuote) that share the same layout.
 function QuoteExplainSection({ block }: { block: QuoteExplainBlock }) {
   return (
-    <section className=" px-6 pt-16 pb-20">
+    <motion.section
+      className=" px-6 pt-16 pb-20"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      variants={fadeInUp}
+    >
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 items-center">
         <div className="border-l-2 border-ink pl-6 pr-10 lg:pr-26">
           <blockquote className="text-lg font-bold leading-snug">
@@ -20,7 +35,7 @@ function QuoteExplainSection({ block }: { block: QuoteExplainBlock }) {
           className="text-lg lg:pr-10 leading-relaxed"
         />
       </div>
-    </section>
+    </motion.section>
   )
 }
 
@@ -80,29 +95,44 @@ export function About({ data }: { data: AboutData }) {
 
   return (
     <>
-      <section className=" px-6 py-20">
-        <h1 className="font-mono lg:text-9xl text-5xl pt-62 font-black lg:pr-86 leading-[0.9]">
-          {heading.split(' ')[0]}
-          <br />
-          {heading.split(' ').slice(1).join(' ')}
-        </h1>
+      <motion.section
+        className=" px-6 py-20"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={fadeInUp}
+      >
+        <HoverText
+          as="h1"
+          text={`${heading.split(' ')[0]}\n${heading.split(' ').slice(1).join(' ')}`}
+          className="font-mono lg:text-9xl text-5xl pt-62 font-black lg:pr-86 leading-[0.9]"
+        />
         <p className="mt-16 max-w-2xl text-lg font-bold">{introText}</p>
         <ScrollFillText
           paragraphs={bodyText}
           className="mt-16 max-w-4xl lg:text-2xl text-lg font-bold leading-relaxed"
         />
-      </section>
+      </motion.section>
 
       <QuoteExplainSection block={openingQuote} />
 
-      <section className="border-t px-6 pb-12 pt-20">
+      <motion.section
+        className="border-t px-6 pb-12 pt-20"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={fadeInUp}
+      >
         <TwoColumnPanel
           panelColor="green"
           left={
             <>
-              <h2 className="mb-4 pt-2 text-center font-bold font-mono text-base ">
-                {problemSection.title}
-              </h2>
+              <HoverText
+                as="h2"
+                text={problemSection.title}
+                className="mb-4 pt-2 text-center font-bold font-mono text-base"
+              />
+
               <div className="text-sm py-2 leading-relaxed">
                 <Paragraphs paragraphs={problemSection.introText} />
               </div>
@@ -135,16 +165,26 @@ export function About({ data }: { data: AboutData }) {
             </>
           }
         />
-      </section>
+      </motion.section>
 
       <QuoteExplainSection block={problemClosingQuote} />
 
-      <section className="px-6 py-12">
+      <motion.section
+        className="px-6 py-12"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={fadeInUp}
+      >
         <TwoColumnPanel
           panelColor="red"
           left={
             <>
-              <h2 className="mb-6 text-center font-mono text-base font-bold">{whoWeAre.title}</h2>
+              <HoverText
+                as="h2"
+                text={whoWeAre.title}
+                className="mb-6 text-center font-mono text-base font-bold"
+              />
 
               <div className="text-sm leading-relaxed">
                 <Paragraphs paragraphs={whoWeAre.body} />
@@ -200,16 +240,23 @@ export function About({ data }: { data: AboutData }) {
             </div>
           }
         />
-      </section>
+      </motion.section>
 
       <CollapsibleSections items={data.collapsibleSections} />
 
-      <section className="border-b border-ink px-6 py-16 text-center">
-        <p className="font-mono lg:text-6xl text-2xl font-black uppercase tracking-wide">
-          Tell No Lies, Claim <br />
-          No Easy Victory
-        </p>
-      </section>
+      <motion.section
+        className="border-b border-ink px-6 py-16 text-center"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={fadeInUp}
+      >
+        <HoverText
+          as="p"
+          text={'Tell No Lies, Claim\nNo Easy Victory'}
+          className="font-mono lg:text-6xl text-2xl font-black uppercase tracking-wide"
+        />
+      </motion.section>
     </>
   )
 }

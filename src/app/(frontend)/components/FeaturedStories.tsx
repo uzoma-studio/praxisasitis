@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion, AnimatePresence, type Variants } from 'motion/react'
 import { HiArrowRight } from 'react-icons/hi'
 import { HoverText } from './HoverText'
 
@@ -20,6 +20,11 @@ type Post = {
 
 const SCROLL_AMOUNT = 280
 const HOOK_WIDTH = 11
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+}
 
 // Walks Lexical's JSON tree and pulls out plain text, for a short preview —
 // not a full rich-text render, just enough for the "What did we do?" excerpt.
@@ -138,7 +143,14 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
   if (!posts.length) return null
 
   return (
-    <section id="featured" className="border-b border-ink px-6 py-12">
+    <motion.section
+      id="featured"
+      className="border-b border-ink px-6 py-12"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      variants={fadeInUp}
+    >
       <div className="mb-10 flex items-center justify-between">
         <HoverText
           as="h2"
@@ -332,6 +344,6 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
           />
         )}
       </div>
-    </section>
+    </motion.section>
   )
 }

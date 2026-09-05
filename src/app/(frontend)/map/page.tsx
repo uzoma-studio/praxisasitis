@@ -1,8 +1,8 @@
-// src/app/(frontend)/map/page.tsx
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 
 import { MovementMap } from '../components/MovementMapLoader'
+import { richTextToPlainText, truncateWords } from '@/lib/richText'
 
 export default async function MapPage() {
   const payloadConfig = await config
@@ -13,11 +13,19 @@ export default async function MapPage() {
       collection: 'posts',
       where: { status: { equals: 'published' } },
       sort: '-dateStart',
-      limit: 500, // stands in for "all" — raise if you expect more geotagged posts than this
+      limit: 800, // stands in for "all" — raise if you expect more geotagged posts than this
       depth: 2, // populate issueTags and media instead of returning bare IDs
     }),
     payload.find({ collection: 'issue-tags', limit: 20 }),
   ])
 
-  return <MovementMap posts={posts.docs as any} tags={tags.docs as any} variant="full" />
+  // MovementMap expects an `excerpt` string, but the collection only has
+  // `whatDidWeDo` as richText — flatten and truncate it here, same as the
+  // homepage does for RecentPosts/FeaturedStories.
+  const mapPosts = posts.docs.map((doc: any) => ({
+    ...doc,
+    excerpt: truncateWords(richTextToPlainText(doc.whatDidWeDo), 50),
+  }))
+
+  return <MovementMap posts={mapPosts as any} tags={tags.docs as any} variant="full" />
 }
