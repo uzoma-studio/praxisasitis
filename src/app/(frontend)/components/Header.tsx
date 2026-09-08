@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { HiMenu, HiX } from 'react-icons/hi'
 import { SiX, SiInstagram, SiFacebook, SiTiktok, SiYoutube } from 'react-icons/si'
 import type { IconType } from 'react-icons'
+import { HoverText } from './HoverText'
 
 type NavItem = { label: string; href: string }
 type SocialLink = { platform: string; url: string }
@@ -100,7 +101,7 @@ export function Header({
             </a>
           ) : (
             <a key={item.href} href={normalizeHref(item.href)}>
-              {item.label}
+              <HoverText text={item.label} />
             </a>
           ),
         )}
