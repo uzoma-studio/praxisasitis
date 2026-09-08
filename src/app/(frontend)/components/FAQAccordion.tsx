@@ -13,7 +13,7 @@ export function FAQAccordion({ items }: { items: FAQItem[] }) {
     <section className="py-12">
       <HoverText
         as="h2"
-        text="FAQ"
+        text="FAQs"
         className="px-6 mb-10 text-2xl font-mono font-bold uppercase tracking-wide"
       />
 
