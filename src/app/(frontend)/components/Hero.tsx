@@ -44,11 +44,7 @@ export function Hero({
           />
 
           {introText && (
-            <HoverText
-              as="p"
-              text={introText}
-              className="mt-6 max-w-md text-sm leading-relaxed opacity-80"
-            />
+            <p className="mt-6 max-w-md text-sm leading-relaxed opacity-80">{introText}</p>
           )}
 
           <div className="mt-8 flex items-center gap-6">

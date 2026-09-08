@@ -4,6 +4,7 @@ import { getPayload } from 'payload'
 
 import config from '@/payload.config'
 import { richTextToPlainText } from '@/lib/richText'
+import { HoverText } from '../../components/HoverText'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -67,9 +68,11 @@ export default async function PostPage({ params }: Props) {
     <main className="min-h-screen overflow-hidden bg-[#181818] pb-24 pt-30 text-[#f5f1e8]">
       <section className="border-b border-white/15 px-6 py-16 lg:px-[4.4vw] lg:py-10">
         <div className="mx-auto max-w-[1800px]">
-          <h1 className="max-w-5xl font-mono text-5xl font-black leading-[0.82] tracking-[-0.07em] sm:text-4xl lg:text-5xl">
-            {post.title}
-          </h1>
+          <HoverText
+            as="h1"
+            text={post.title}
+            className="max-w-5xl font-mono text-5xl font-black leading-[0.82] tracking-[-0.07em] sm:text-4xl lg:text-5xl"
+          />
         </div>
       </section>
 
