@@ -12,7 +12,7 @@ export default async function ArchivePage() {
       collection: 'posts',
       where: { status: { equals: 'published' } },
       sort: '-dateStart',
-      limit: 100,
+      limit: 0,
       depth: 2,
     }),
     payload.find({
@@ -21,11 +21,11 @@ export default async function ArchivePage() {
     }),
   ])
 
-    const archivePosts = posts.docs.map((post: any) => {
+  const archivePosts = posts.docs.map((post: any) => {
     const media = Array.isArray(post.media) ? post.media : []
 
     const firstImage = media.find(
-        (item: unknown) =>
+      (item: unknown) =>
         typeof item === 'object' &&
         item !== null &&
         'mimeType' in item &&
@@ -34,20 +34,20 @@ export default async function ArchivePage() {
     ) as { url?: string } | undefined
 
     return {
-        id: post.id,
-        slug: post.slug,
-        title: post.title,
-        location: post.locationDescription,
-        imageUrl: firstImage?.url ?? null,
-        tags: (post.issueTags ?? [])
+      id: post.id,
+      slug: post.slug,
+      title: post.title,
+      location: post.locationDescription,
+      imageUrl: firstImage?.url ?? null,
+      tags: (post.issueTags ?? [])
         .filter((tag: unknown) => typeof tag === 'object' && tag !== null)
         .map((tag: any) => ({
-            id: tag.id,
-            name: tag.name,
-            color: tag.color,
+          id: tag.id,
+          name: tag.name,
+          color: tag.color,
         })),
     }
-    })
+  })
 
   const archiveTags = tags.docs.map((tag: any) => ({
     id: tag.id,

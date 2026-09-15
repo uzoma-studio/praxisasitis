@@ -14,6 +14,7 @@ export default async function FAQPage() {
     payload.find({
       collection: 'faq',
       sort: 'order',
+      limit: 100,
     }),
   ])
 
