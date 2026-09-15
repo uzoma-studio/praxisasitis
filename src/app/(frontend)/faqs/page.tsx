@@ -27,7 +27,7 @@ export default async function FAQPage() {
 
   return (
     <div className="pt-16">
-      <FAQAccordion items={faqItems as any} />
+      <FAQAccordion items={faqItems as any} sticky />
     </div>
   )
 }

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react'
 import { HoverText } from './HoverText'
 type FAQItem = { id: string; question: string; answer: string }
 
-export function FAQAccordion({ items }: { items: FAQItem[] }) {
+export function FAQAccordion({ items, sticky = false }: { items: FAQItem[]; sticky?: boolean }) {
   const [openId, setOpenId] = useState<string | null>(null)
   const openIndex = items.findIndex((item) => item.id === openId)
   const openItem = openIndex >= 0 ? items[openIndex] : null
@@ -60,30 +60,56 @@ export function FAQAccordion({ items }: { items: FAQItem[] }) {
           )
         })}
 
-        {/* md and up: sliding side panel, unaffected by document flow. */}
+        {/* md and up: side panel. Homepage (short list) keeps the original
+            absolute overlay. Full FAQ page (long list) uses a sticky panel
+            with a fixed standard height, via the `sticky` prop. */}
         <AnimatePresence>
-          {openItem && (
-            <motion.div
-              key={openItem.id}
-              initial={{ width: 0 }}
-              animate={{ width: 460 }}
-              exit={{ width: 0 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="absolute -inset-y-8 right-0 z-10 hidden overflow-hidden rounded-lg bg-ink md:block "
-            >
-              <div className="flex h-full w-[440px] flex-col p-8 text-paper">
-                <span className="font-mono text-4xl font-bold opacity-90 shrink-0">
-                  {String(openIndex + 1).padStart(2, '0')}
-                </span>
-                <h3 className="mt-4 text-base font-mono font-bold leading-tight shrink-0">
-                  {openItem.question}
-                </h3>
-                <div className="mt-2 flex-1 min-h-0 overflow-y-auto pr-2 -mr-2">
-                  <p className="text-sm leading-relaxed text-paper/80">{openItem.answer}</p>
-                </div>
+          {openItem &&
+            (sticky ? (
+              <div className="absolute inset-y-8 inset-x-0 z-10 hidden md:block pointer-events-none">
+                <motion.div
+                  key={openItem.id}
+                  initial={{ width: 0 }}
+                  animate={{ width: 460 }}
+                  exit={{ width: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                  className="sticky top-24 ml-auto h-[calc(100vh-8rem)] overflow-hidden rounded-lg bg-ink pointer-events-auto"
+                >
+                  <div className="flex h-full w-[440px] flex-col p-8 text-paper">
+                    <span className="font-mono text-4xl font-bold opacity-90 shrink-0">
+                      {String(openIndex + 1).padStart(2, '0')}
+                    </span>
+                    <h3 className="mt-4 text-base font-mono font-bold leading-tight shrink-0">
+                      {openItem.question}
+                    </h3>
+                    <div className="mt-2 flex-1 min-h-0 overflow-y-auto pr-2 -mr-2">
+                      <p className="text-sm leading-relaxed text-paper/80">{openItem.answer}</p>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
-            </motion.div>
-          )}
+            ) : (
+              <motion.div
+                key={openItem.id}
+                initial={{ width: 0 }}
+                animate={{ width: 460 }}
+                exit={{ width: 0 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                className="absolute -inset-y-8 right-0 z-10 hidden overflow-hidden rounded-lg bg-ink md:block"
+              >
+                <div className="flex h-full w-[440px] flex-col p-8 text-paper">
+                  <span className="font-mono text-4xl font-bold opacity-90 shrink-0">
+                    {String(openIndex + 1).padStart(2, '0')}
+                  </span>
+                  <h3 className="mt-4 text-base font-mono font-bold leading-tight shrink-0">
+                    {openItem.question}
+                  </h3>
+                  <div className="mt-2 flex-1 min-h-0 overflow-y-auto pr-2 -mr-2">
+                    <p className="text-sm leading-relaxed text-paper/80">{openItem.answer}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
         </AnimatePresence>
       </div>
     </section>
