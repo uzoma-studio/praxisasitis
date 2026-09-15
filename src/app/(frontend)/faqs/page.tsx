@@ -4,6 +4,8 @@ import config from '@/payload.config'
 import { FAQAccordion } from '../components/FAQAccordion'
 import { richTextToPlainText } from '@/lib/richText'
 
+export const dynamic = 'force-dynamic'
+
 export default async function FAQPage() {
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
