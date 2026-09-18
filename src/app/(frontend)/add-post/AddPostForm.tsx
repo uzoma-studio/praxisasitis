@@ -276,8 +276,9 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
             <Field label="Private contact (optional)">
               <input
                 name="authorContact"
-                placeholder="Email or phone number — only visible to editors"
+                placeholder="Email - only visible to editors"
                 className={inputClass}
+                required={true}
               />
             </Field>
 

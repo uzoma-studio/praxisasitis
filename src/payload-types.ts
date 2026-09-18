@@ -183,7 +183,7 @@ export interface Post {
    */
   slug?: string | null;
   authorName: string;
-  authorContact?: string | null;
+  email: string;
   dateStart: string;
   dateEnd?: string | null;
   locationDescription: string;
@@ -258,6 +258,10 @@ export interface Post {
   featured?: boolean | null;
   status?: ('draft' | 'pending-review' | 'published' | 'rejected') | null;
   locationSensitive?: boolean | null;
+  /**
+   * Automatically set the first time this post is published.
+   */
+  publishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -436,7 +440,7 @@ export interface PostsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   authorName?: T;
-  authorContact?: T;
+  email?: T;
   dateStart?: T;
   dateEnd?: T;
   locationDescription?: T;
@@ -451,6 +455,7 @@ export interface PostsSelect<T extends boolean = true> {
   featured?: T;
   status?: T;
   locationSensitive?: T;
+  publishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
