@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
   const {
     authorName,
-    authorContact,
+    email,
     title,
     dateStart,
     dateEnd,
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       collection: 'posts',
       data: {
         authorName,
-        authorContact,
+        email,
         title,
         dateStart,
         dateEnd: dateEnd || undefined,

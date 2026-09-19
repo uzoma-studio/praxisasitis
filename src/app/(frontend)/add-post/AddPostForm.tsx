@@ -160,7 +160,7 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           authorName: form.get('authorName'),
-          authorContact: form.get('authorContact'),
+          email: form.get('email'),
           title: form.get('title'),
           dateStart: form.get('dateStart'),
           dateEnd: form.get('dateEnd') || undefined,
@@ -273,10 +273,13 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
               <input name="authorName" required placeholder="Your name" className={inputClass} />
             </Field>
 
-            <Field label="Private contact (optional)">
+            <Field label="Email (only visible to editors)">
               <input
-                name="authorContact"
-                placeholder="Email or phone number — only visible to editors"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                placeholder="you@example.com"
                 className={inputClass}
               />
             </Field>

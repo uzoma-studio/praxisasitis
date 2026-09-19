@@ -19,43 +19,38 @@ export default async function HomePage() {
       collection: 'posts',
       where: { featured: { equals: true }, status: { equals: 'published' } },
       limit: 6,
+      depth: 2,
     }),
     payload.find({
       collection: 'posts',
       where: { status: { equals: 'published' } },
-      sort: '-dateStart',
+      sort: '-publishedAt',
       limit: 9,
-      depth: 2, // populate issueTags and media instead of returning bare IDs
+      depth: 2,
     }),
     payload.find({ collection: 'issue-tags', limit: 20 }),
     payload.find({ collection: 'faq', sort: 'order', limit: 6 }),
     payload.findGlobal({ slug: 'site-settings' }),
   ])
 
-  // RecentPosts expects an `excerpt` string, but the collection only has
-  // `whatDidWeDo` as richText — flatten and truncate it here.
   const recentPosts = recent.docs.map((doc: any) => ({
     ...doc,
     excerpt: truncateWords(richTextToPlainText(doc.whatDidWeDo), 30),
   }))
 
-  // FAQAccordion expects `answer` as plain text, but the collection stores
-  // it as Lexical richText — flatten it here, same as the post excerpts.
   const faqItems = faqs.docs.map((doc: any) => ({
     ...doc,
     answer: richTextToPlainText(doc.answer),
   }))
+
+  const heroImages = featured.docs.map((post: any) => post.media?.[0]?.url).filter(Boolean)
 
   return (
     <>
       <Hero
         tagline={settings.tagline ?? undefined}
         introText={settings.introText ?? undefined}
-        illustrationUrl={
-          typeof settings.heroIllustration === 'object'
-            ? (settings.heroIllustration?.url ?? undefined)
-            : undefined
-        }
+        images={heroImages}
       />
       <FeaturedStories posts={featured.docs as any} />
       <RecentPosts posts={recentPosts as any} />
