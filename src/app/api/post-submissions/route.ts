@@ -24,6 +24,7 @@ export async function POST(request: Request) {
     whatIsStillUnclear,
     request: requestText,
     locationSensitive,
+    coverImage,
     media,
   } = body
 
@@ -73,6 +74,7 @@ export async function POST(request: Request) {
         whatIsStillUnclear: toLexical(whatIsStillUnclear),
         request: requestText ? toLexical(requestText) : undefined,
         locationSensitive: Boolean(locationSensitive),
+        coverImage: coverImage || undefined,
         media,
         status: 'pending-review',
       },
