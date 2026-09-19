@@ -10,6 +10,83 @@ type Props = {
   params: Promise<{ slug: string }>
 }
 
+function mediaKind(mimeType?: string | null) {
+  const type = mimeType ?? ''
+  if (type.startsWith('image/')) return 'image'
+  if (type.startsWith('video/')) return 'video'
+  if (type.startsWith('audio/')) return 'audio'
+  if (type === 'application/pdf') return 'pdf'
+  return 'other'
+}
+
+function formatSize(bytes?: number | null) {
+  if (!bytes) return ''
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+// One tile in the media gallery. Video and audio play inline; PDFs (and
+// anything else) open in a new tab.
+function GalleryItem({ item, postTitle }: { item: any; postTitle: string }) {
+  const kind = mediaKind(item.mimeType)
+  const label = item.alt || item.filename || 'Untitled'
+
+  if (kind === 'image') {
+    return (
+      <img
+        src={item.url}
+        alt={item.alt ?? `${postTitle} documentation`}
+        className="aspect-[4/3] w-full object-cover"
+      />
+    )
+  }
+
+  if (kind === 'video') {
+    return (
+      <div className="sm:col-span-2">
+        <video controls preload="metadata" playsInline className="aspect-video w-full bg-black">
+          <source src={item.url} type={item.mimeType} />
+          <a href={item.url}>Download the video</a>
+        </video>
+      </div>
+    )
+  }
+
+  if (kind === 'audio') {
+    return (
+      <div className="border border-white/20 p-5 sm:col-span-2">
+        <p className="font-mono text-xs font-bold uppercase tracking-wide text-white/60">Audio</p>
+        <p className="mb-4 mt-2 truncate font-mono text-sm font-bold">{label}</p>
+        <audio controls preload="none" className="w-full">
+          <source src={item.url} type={item.mimeType} />
+        </audio>
+      </div>
+    )
+  }
+
+  const size = formatSize(item.filesize)
+
+  return (
+    <a
+      href={item.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex items-center justify-between gap-4 border border-white/20 p-5 transition-colors hover:bg-white/10"
+    >
+      <span className="min-w-0">
+        <span className="block font-mono text-xs font-bold uppercase tracking-wide text-white/60">
+          {kind === 'pdf' ? 'PDF' : 'File'}
+          {size ? ` · ${size}` : ''}
+        </span>
+        <span className="mt-2 block truncate font-mono text-sm font-bold">{label}</span>
+      </span>
+      <span className="shrink-0 font-mono text-xs font-bold uppercase group-hover:underline">
+        Open ↗
+      </span>
+    </a>
+  )
+}
+
 export default async function PostPage({ params }: Props) {
   const { slug } = await params
   const payloadConfig = await config
@@ -33,12 +110,20 @@ export default async function PostPage({ params }: Props) {
   )
 
   const media = (post.media ?? []).filter(
-    (item): item is any => typeof item === 'object' && item !== null,
+    (item): item is any => typeof item === 'object' && item !== null && Boolean(item.url),
   )
 
-  const images = media.filter((item) => item.mimeType?.startsWith('image/') && item.url)
+  const coverField = typeof post.coverImage === 'object' ? post.coverImage : null
 
-  const [coverImage, ...supportingImages] = images
+  // Older posts have no cover field: their first gallery image was the cover,
+  // so keep using it and leave it out of the gallery so it isn't shown twice.
+  const fallbackCover = coverField
+    ? null
+    : media.find((item) => item.mimeType?.startsWith('image/'))
+
+  const coverImage = coverField ?? fallbackCover ?? null
+
+  const galleryItems = media.filter((item) => item.id !== fallbackCover?.id)
 
   const sections = [
     {
@@ -153,7 +238,7 @@ export default async function PostPage({ params }: Props) {
       </section>
 
       <section className="mx-auto mt-16 max-w-[1200px] px-6 lg:mt-20">
-        {sections.slice(1).map((section, index) => (
+        {sections.slice(1).map((section) => (
           <article
             key={section.label}
             className="grid gap-8 border-t border-white/20 py-14 lg:grid-cols-[230px_minmax(0,1fr)] lg:py-20"
@@ -166,21 +251,23 @@ export default async function PostPage({ params }: Props) {
             <p className="max-w-3xl whitespace-pre-line leading-tight text-whites text-xl">
               {section.content}
             </p>
-
-            {index === 0 && supportingImages.length > 0 && (
-              <div className="grid grid-cols-1 gap-4 lg:col-start-2 sm:grid-cols-2">
-                {supportingImages.map((image) => (
-                  <img
-                    key={image.id}
-                    src={image.url}
-                    alt={image.alt ?? `${post.title} documentation`}
-                    className="aspect-[4/3] w-full object-cover"
-                  />
-                ))}
-              </div>
-            )}
           </article>
         ))}
+
+        {galleryItems.length > 0 && (
+          <article className="grid gap-8 border-t border-white/20 py-14 lg:grid-cols-[230px_minmax(0,1fr)] lg:py-20">
+            <div>
+              <p className="font-mono text-sm font-bold text-white/60">Media</p>
+              <h2 className="mt-2 font-mono text-xl font-bold">Gallery</h2>
+            </div>
+
+            <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
+              {galleryItems.map((item) => (
+                <GalleryItem key={item.id} item={item} postTitle={post.title} />
+              ))}
+            </div>
+          </article>
+        )}
 
         {post.request && (
           <aside className="mt-10 border border-white bg-praxisgreen p-8 lg:mt-12 lg:p-12 rounded">

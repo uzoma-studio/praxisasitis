@@ -35,15 +35,17 @@ export const IssueTags: CollectionConfig = {
     },
     {
       name: 'color',
-      type: 'select',
+      type: 'text',
       required: true,
-      options: [
-        { label: 'Red', value: '#D10000' },
-        { label: 'Green', value: '#00853F' },
-        { label: 'Blue', value: '#0095D9' },
-        { label: 'Amber', value: '#FCCA00' },
-        { label: 'Purple', value: '#A900B2' },
-      ],
+      defaultValue: '#00853F',
+      validate: (value?: string | null) =>
+        /^#[0-9a-fA-F]{6}$/.test(value ?? '') || 'Pick a colour from the palette.',
+      admin: {
+        description: 'Pick the colour used for this tag across the site.',
+        components: {
+          Field: '/fields/ColorPaletteField#ColorPaletteField',
+        },
+      },
     },
   ],
 }

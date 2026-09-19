@@ -8,13 +8,20 @@ const slugify = (text: string) =>
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '')
 
+// Walks the Lexical tree and joins only the actual text nodes, so JSON
+// keys like "root", "type", "paragraph" and "version" are never counted.
+const extractText = (node: any): string => {
+  if (!node) return ''
+  if (typeof node.text === 'string') return node.text
+  if (node.root) return extractText(node.root)
+  if (Array.isArray(node.children)) return node.children.map(extractText).join(' ')
+  return ''
+}
+
 const minWords = (min: number) => (value: any) => {
   if (!value) return `This field is required.`
-  const text = JSON.stringify(value)
-    .replace(/[{}[\]":,]/g, ' ')
-    .trim()
-  const wordCount = text.split(/\s+/).filter(Boolean).length
-  return wordCount >= min || `Needs at least ${min} words (currently ~${wordCount}).`
+  const wordCount = extractText(value).split(/\s+/).filter(Boolean).length
+  return wordCount >= min || `Needs at least ${min} words (currently ${wordCount}).`
 }
 
 export const Posts: CollectionConfig = {
@@ -147,13 +154,21 @@ export const Posts: CollectionConfig = {
     // 12. Request (optional)
     { name: 'request', type: 'richText', label: 'Request (e.g. "We need a lawyer")' },
 
-    // 13. Media attachments (optional) — images, audio, video
+    // 13. Cover image (optional) — the main image shown for the post
+    {
+      name: 'coverImage',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Cover image',
+    },
+
+    // 13b. Media gallery (optional) — extra images, audio, video and PDFs
     {
       name: 'media',
       type: 'upload',
       relationTo: 'media',
       hasMany: true,
-      label: 'Media attachments',
+      label: 'Media gallery',
     },
 
     // Editorial / archive plumbing

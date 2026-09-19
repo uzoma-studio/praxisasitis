@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useRef, useState } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { AnimatePresence, motion } from 'motion/react'
 import { HoverText } from '../components/HoverText'
@@ -26,12 +26,44 @@ const scales = [
   { value: 'multi-city', label: 'Multi-city' },
 ]
 
+// Vercel rejects request bodies over 4.5 MB and uploads currently go through
+// /api/media, so keep each file under that. Raise this once uploads go
+// directly to storage. Keep the image list in sync with Media.ts.
+const MAX_FILE_MB = 4
+const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024
+const MAX_FILES = 10
+const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']
+const IMAGE_ACCEPT = IMAGE_TYPES.join(',')
+const ACCEPT = [...IMAGE_TYPES, 'audio/*', 'video/*', 'application/pdf'].join(',')
+
+function isAllowedType(file: File) {
+  return (
+    IMAGE_TYPES.includes(file.type) ||
+    file.type.startsWith('audio/') ||
+    file.type.startsWith('video/') ||
+    file.type === 'application/pdf'
+  )
+}
+
+function fileKind(file: File) {
+  if (file.type.startsWith('image/')) return 'Image'
+  if (file.type.startsWith('audio/')) return 'Audio'
+  if (file.type.startsWith('video/')) return 'Video'
+  return 'PDF'
+}
+
+function formatSize(bytes: number) {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
 export function AddPostForm({ tags }: { tags: Tag[] }) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const locationDescriptionRef = useRef<HTMLInputElement>(null)
 
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
+  const [coverFile, setCoverFile] = useState<File | null>(null)
   const [coverPreview, setCoverPreview] = useState<string | null>(null)
+  const [mediaFiles, setMediaFiles] = useState<File[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Field-adjacent validation errors, plus a top-of-form banner for
@@ -39,11 +71,27 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
   // success confirmation) that aren't tied to one specific field.
   const [tagsError, setTagsError] = useState<string | null>(null)
   const [locationError, setLocationError] = useState<string | null>(null)
+  const [coverError, setCoverError] = useState<string | null>(null)
+  const [mediaError, setMediaError] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const [lat, setLat] = useState<number | undefined>(undefined)
   const [lng, setLng] = useState<number | undefined>(undefined)
+
+  // Preview for the cover image. The object URL is revoked whenever the
+  // cover changes or the form unmounts.
+  useEffect(() => {
+    if (!coverFile) {
+      setCoverPreview(null)
+      return undefined
+    }
+
+    const url = URL.createObjectURL(coverFile)
+    setCoverPreview(url)
+
+    return () => URL.revokeObjectURL(url)
+  }, [coverFile])
 
   function toggleTag(tagId: string) {
     setSelectedTagIds((current) =>
@@ -51,12 +99,52 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
     )
   }
 
-  function removeSelectedMedia() {
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
+  function pickCover(files: File[]) {
+    const file = files[0]
+    if (!file) return
+
+    if (!IMAGE_TYPES.includes(file.type)) {
+      setCoverError('The cover must be an image (JPG, PNG, WebP, GIF or AVIF).')
+    } else if (file.size > MAX_FILE_BYTES) {
+      setCoverError(`${file.name} is over ${MAX_FILE_MB} MB.`)
+    } else {
+      setCoverFile(file)
+      setCoverError(null)
+    }
+  }
+
+  function removeCover() {
+    setCoverFile(null)
+    setCoverError(null)
+  }
+
+  function addMediaFiles(incoming: File[]) {
+    const problems: string[] = []
+    const accepted: File[] = []
+
+    for (const file of incoming) {
+      if (!isAllowedType(file)) {
+        problems.push(`${file.name} is not a supported file type.`)
+      } else if (file.size > MAX_FILE_BYTES) {
+        problems.push(`${file.name} is over ${MAX_FILE_MB} MB.`)
+      } else {
+        accepted.push(file)
+      }
     }
 
-    setCoverPreview(null)
+    const room = MAX_FILES - mediaFiles.length
+
+    if (accepted.length > room) {
+      problems.push(`You can add up to ${MAX_FILES} files.`)
+    }
+
+    setMediaFiles((current) => [...current, ...accepted.slice(0, room)])
+    setMediaError(problems.length ? problems.join(' ') : null)
+  }
+
+  function removeMediaFile(index: number) {
+    setMediaFiles((current) => current.filter((_, i) => i !== index))
+    setMediaError(null)
   }
 
   function useMyLocation() {
@@ -134,7 +222,6 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
     setSuccessMessage(null)
 
     const form = new FormData(formElement)
-    const files = Array.from(fileInputRef.current?.files ?? [])
 
     let hasError = false
 
@@ -153,7 +240,10 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
     setIsSubmitting(true)
 
     try {
-      const mediaIds = await uploadFiles(files)
+      const [coverIds, mediaIds] = await Promise.all([
+        uploadFiles(coverFile ? [coverFile] : []),
+        uploadFiles(mediaFiles),
+      ])
 
       const response = await fetch('/api/post-submissions', {
         method: 'POST',
@@ -174,6 +264,7 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
           whatIsStillUnclear: form.get('whatIsStillUnclear'),
           request: form.get('request') || undefined,
           locationSensitive: form.get('locationSensitive') === 'on',
+          coverImage: coverIds[0],
           media: mediaIds,
         }),
       })
@@ -185,7 +276,10 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
 
       formElement.reset()
       setSelectedTagIds([])
-      setCoverPreview(null)
+      setCoverFile(null)
+      setCoverError(null)
+      setMediaFiles([])
+      setMediaError(null)
       setLat(undefined)
       setLng(undefined)
       setSuccessMessage('Thank you. Your post has been sent for editorial review.')
@@ -421,6 +515,62 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
               hint="For example: We need a lawyer, documentation, funding, or solidarity."
             />
 
+            <fieldset>
+              <legend className="mb-1 font-mono text-sm font-bold">Media gallery (optional)</legend>
+              <p className="mb-3 text-xs opacity-70">
+                Extra images, audio, video or PDFs that help tell the story. Up to {MAX_FILES}{' '}
+                files, {MAX_FILE_MB} MB each.
+              </p>
+
+              <label className="inline-block cursor-pointer border border-ink px-4 py-3 font-mono text-xs font-bold uppercase hover:bg-ink hover:text-paper">
+                + Add media
+                <input
+                  type="file"
+                  multiple
+                  accept={ACCEPT}
+                  className="sr-only"
+                  onChange={(event) => {
+                    addMediaFiles(Array.from(event.target.files ?? []))
+                    // Reset so picking the same file again still fires onChange.
+                    event.target.value = ''
+                  }}
+                />
+              </label>
+
+              {mediaError && (
+                <p className="mt-3 text-sm text-red-700" role="alert">
+                  {mediaError}
+                </p>
+              )}
+
+              {mediaFiles.length > 0 && (
+                <ul className="mt-4 space-y-2">
+                  {mediaFiles.map((file, index) => (
+                    <li
+                      key={`${file.name}-${file.size}-${index}`}
+                      className="flex items-center justify-between gap-3 border border-ink/30 px-3 py-2 text-xs"
+                    >
+                      <span className="min-w-0">
+                        <span className="block truncate font-mono font-bold">{file.name}</span>
+                        <span className="opacity-60">
+                          {fileKind(file)} · {formatSize(file.size)}
+                        </span>
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => removeMediaFile(index)}
+                        className="shrink-0 font-mono opacity-50 transition-opacity hover:opacity-100"
+                        aria-label={`Remove ${file.name}`}
+                      >
+                        ×
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </fieldset>
+
             <button
               type="submit"
               disabled={isSubmitting}
@@ -431,9 +581,8 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
           </div>
 
           {/* On mobile this grid is a single column, so items stack by DOM
-              order — order-first moves the image upload block above the
-              fields (and the submit button, which lives at the end of the
-              fields div) on small screens. lg:order-none reverts to normal
+              order — order-first moves the cover image block above the
+              fields on small screens. lg:order-none reverts to normal
               source order once the two-column desktop grid kicks in, so
               desktop is unaffected. */}
           <aside className="order-first lg:order-none lg:pt-3">
@@ -441,17 +590,13 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
               <div className="relative">
                 <label className="block cursor-pointer">
                   <input
-                    ref={fileInputRef}
                     type="file"
-                    multiple
-                    accept="image/*,audio/*,video/*"
+                    accept={IMAGE_ACCEPT}
                     className="sr-only"
                     onChange={(event) => {
-                      const firstImage = Array.from(event.target.files ?? []).find((file) =>
-                        file.type.startsWith('image/'),
-                      )
-
-                      setCoverPreview(firstImage ? URL.createObjectURL(firstImage) : null)
+                      pickCover(Array.from(event.target.files ?? []))
+                      // Reset so picking the same file again still fires onChange.
+                      event.target.value = ''
                     }}
                   />
 
@@ -467,16 +612,23 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
                 {coverPreview && (
                   <button
                     type="button"
-                    onClick={removeSelectedMedia}
+                    onClick={removeCover}
                     className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center bg-ink text-paper transition-opacity hover:opacity-80"
-                    aria-label="Remove selected media"
+                    aria-label="Remove cover image"
                   >
                     ×
                   </button>
                 )}
               </div>
 
-              <p className="mt-3 font-mono text-xs font-bold">Add cover image or media</p>
+              <p className="mt-3 font-mono text-xs font-bold">Add cover image</p>
+              <p className="mt-1 text-xs opacity-70">One image, up to {MAX_FILE_MB} MB.</p>
+
+              {coverError && (
+                <p className="mt-3 text-sm text-red-700" role="alert">
+                  {coverError}
+                </p>
+              )}
             </div>
           </aside>
         </form>
