@@ -43,6 +43,16 @@ export const Posts: CollectionConfig = {
         return data
       },
     ],
+    beforeChange: [
+      ({ data, originalDoc }) => {
+        const isBecomingPublished =
+          data.status === 'published' && originalDoc?.status !== 'published'
+        if (isBecomingPublished && !data.publishedAt) {
+          data.publishedAt = new Date().toISOString()
+        }
+        return data
+      },
+    ],
   },
   fields: [
     // 1. Title
@@ -63,11 +73,12 @@ export const Posts: CollectionConfig = {
     // 2. Author name
     { name: 'authorName', type: 'text', required: true, label: 'Author name (real or pseudonym)' },
 
-    // 3. Author contact (optional, visibility TBD — gated to logged-in users for now)
+    // 3. Author email
     {
-      name: 'authorContact',
-      type: 'text',
-      label: 'Author contact (email, Phone number)',
+      name: 'email',
+      type: 'email',
+      required: true,
+      label: 'Author email',
       access: { read: ({ req: { user } }) => Boolean(user) },
     },
 
@@ -171,5 +182,29 @@ export const Posts: CollectionConfig = {
       ],
     },
     { name: 'locationSensitive', type: 'checkbox', label: 'Hide precise location publicly' },
+
+    // 14. Publish timestamp — set automatically the first time status becomes 'published'
+    {
+      name: 'publishedAt',
+      type: 'date',
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+        description: 'Automatically set the first time this post is published.',
+      },
+    },
+
+    // 15. Sidebar-only button, right below Published At — email the author
+    // a "give us an update" note, prefilled to their address and subject.
+    {
+      name: 'emailAuthorButton',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '/components/admin/EmailAuthorButton#EmailAuthorButton',
+        },
+      },
+    },
   ],
 }
