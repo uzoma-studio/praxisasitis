@@ -254,6 +254,7 @@ export interface Post {
     };
     [k: string]: unknown;
   } | null;
+  coverImage?: (number | null) | Media;
   media?: (number | Media)[] | null;
   featured?: boolean | null;
   status?: ('draft' | 'pending-review' | 'published' | 'rejected') | null;
@@ -276,7 +277,10 @@ export interface IssueTag {
    * Leave blank to auto-generate from the name.
    */
   slug?: string | null;
-  color: '#D10000' | '#00853F' | '#0095D9' | '#FCCA00' | '#A900B2';
+  /**
+   * Pick the colour used for this tag across the site.
+   */
+  color: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -451,6 +455,7 @@ export interface PostsSelect<T extends boolean = true> {
   whatDidWeLearn?: T;
   whatIsStillUnclear?: T;
   request?: T;
+  coverImage?: T;
   media?: T;
   featured?: T;
   status?: T;
