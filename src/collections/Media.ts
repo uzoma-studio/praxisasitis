@@ -15,6 +15,11 @@ export const Media: CollectionConfig = {
       type: 'text',
       required: true,
     },
+    {
+      name: 'caption',
+      type: 'text',
+      label: 'Credit (optional)',
+    },
   ],
   upload: {
     // Images are listed explicitly so SVG (which can carry scripts) is

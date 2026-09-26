@@ -26,18 +26,27 @@ function formatSize(bytes?: number | null) {
 }
 
 // One tile in the media gallery. Video and audio play inline; PDFs (and
-// anything else) open in a new tab.
+// anything else) open in a new tab. The credit, when present, is overlaid
+// on the bottom-left corner of image tiles (not shown below them).
 function GalleryItem({ item, postTitle }: { item: any; postTitle: string }) {
   const kind = mediaKind(item.mimeType)
   const label = item.alt || item.filename || 'Untitled'
+  const credit = item.caption as string | undefined
 
   if (kind === 'image') {
     return (
-      <img
-        src={item.url}
-        alt={item.alt ?? `${postTitle} documentation`}
-        className="aspect-[4/3] w-full object-cover"
-      />
+      <div className="relative aspect-[4/3] w-full overflow-hidden">
+        <img
+          src={item.url}
+          alt={item.alt ?? `${postTitle} documentation`}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        {credit && (
+          <p className="absolute bottom-0 left-0 z-10 max-w-[85%] bg-black/60 px-2 py-1 text-xs text-white">
+            {credit}
+          </p>
+        )}
+      </div>
     )
   }
 
@@ -48,6 +57,7 @@ function GalleryItem({ item, postTitle }: { item: any; postTitle: string }) {
           <source src={item.url} type={item.mimeType} />
           <a href={item.url}>Download the video</a>
         </video>
+        {credit && <p className="mt-2 text-xs text-white/60">{credit}</p>}
       </div>
     )
   }
@@ -60,6 +70,7 @@ function GalleryItem({ item, postTitle }: { item: any; postTitle: string }) {
         <audio controls preload="none" className="w-full">
           <source src={item.url} type={item.mimeType} />
         </audio>
+        {credit && <p className="mt-2 text-xs text-white/60">{credit}</p>}
       </div>
     )
   }
@@ -79,6 +90,7 @@ function GalleryItem({ item, postTitle }: { item: any; postTitle: string }) {
           {size ? ` · ${size}` : ''}
         </span>
         <span className="mt-2 block truncate font-mono text-sm font-bold">{label}</span>
+        {credit && <span className="mt-1 block text-xs text-white/50">{credit}</span>}
       </span>
       <span className="shrink-0 font-mono text-xs font-bold uppercase group-hover:underline">
         Open ↗
@@ -261,10 +273,17 @@ export default async function PostPage({ params }: Props) {
               <h2 className="mt-2 font-mono text-xl font-bold">Gallery</h2>
             </div>
 
-            <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
-              {galleryItems.map((item) => (
-                <GalleryItem key={item.id} item={item} postTitle={post.title} />
-              ))}
+            <div>
+              <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
+                {galleryItems.map((item) => (
+                  <GalleryItem key={item.id} item={item} postTitle={post.title} />
+                ))}
+              </div>
+
+              <p className="mt-6 text-xs italic text-white/50">
+                If any of these media items belong to you, please inform us so we can appropriately
+                acknowledge you.
+              </p>
             </div>
           </article>
         )}
