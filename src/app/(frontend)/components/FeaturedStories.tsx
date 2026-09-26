@@ -13,7 +13,7 @@ type Post = {
   slug: string
   whatDidWeDo?: any // Lexical richText JSON from Payload
   dateStart: string
-  media?: { url?: string }[]
+  coverImage?: { url?: string }
   issueTags?: { name: string }[]
   locationDescription?: string
 }
@@ -195,9 +195,9 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
                 transition={{ duration: 0.25 }}
                 className="flex h-full flex-col"
               >
-                {active.media?.[0]?.url && (
+                {active.coverImage?.url && (
                   <Image
-                    src={active.media[0].url}
+                    src={active.coverImage.url}
                     alt={active.title}
                     width={800}
                     height={500}
@@ -294,9 +294,9 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
                       className="overflow-hidden border-b border-ink md:hidden"
                     >
                       <Link href={`/archives/${active.slug}`} className="flex flex-col">
-                        {active.media?.[0]?.url && (
+                        {active.coverImage?.url && (
                           <Image
-                            src={active.media[0].url}
+                            src={active.coverImage.url}
                             alt={active.title}
                             width={800}
                             height={500}

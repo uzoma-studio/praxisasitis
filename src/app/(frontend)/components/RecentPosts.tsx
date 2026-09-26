@@ -14,7 +14,7 @@ type Post = {
   excerpt?: string
   authorName?: string
   locationDescription?: string
-  media?: { url?: string }[]
+  coverImage?: { url?: string }
   issueTags?: { name: string; color?: string }[]
 }
 
@@ -304,10 +304,10 @@ export function RecentPosts({ posts }: { posts: Post[] }) {
                           </Link>
                         </div>
 
-                        {activePost.media?.[0]?.url && (
-                          <div className="relative h-48 w-full overflow-hidden md:h-64">
+                        {activePost.coverImage?.url && (
+                          <div className="relative h-48 w-full overflow-hidden md:h-72">
                             <Image
-                              src={activePost.media[0].url}
+                              src={activePost.coverImage.url}
                               alt={activePost.title}
                               fill
                               className="object-cover"

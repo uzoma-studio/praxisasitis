@@ -3,6 +3,8 @@ import config from '@/payload.config'
 
 import { Archive } from '../components/Archive'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ArchivePage() {
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
@@ -22,23 +24,12 @@ export default async function ArchivePage() {
   ])
 
   const archivePosts = posts.docs.map((post: any) => {
-    const media = Array.isArray(post.media) ? post.media : []
-
-    const firstImage = media.find(
-      (item: unknown) =>
-        typeof item === 'object' &&
-        item !== null &&
-        'mimeType' in item &&
-        typeof item.mimeType === 'string' &&
-        item.mimeType.startsWith('image/'),
-    ) as { url?: string } | undefined
-
     return {
       id: post.id,
       slug: post.slug,
       title: post.title,
       location: post.locationDescription,
-      imageUrl: firstImage?.url ?? null,
+      imageUrl: post.coverImage?.url ?? null,
       tags: (post.issueTags ?? [])
         .filter((tag: unknown) => typeof tag === 'object' && tag !== null)
         .map((tag: any) => ({
