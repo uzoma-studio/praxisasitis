@@ -43,7 +43,9 @@ export default async function HomePage() {
     answer: richTextToPlainText(doc.answer),
   }))
 
-  const heroImages = featured.docs.map((post: any) => post.media?.[0]?.url).filter(Boolean)
+  const heroImages = featured.docs
+    .map((post: any) => post.coverImage?.url ?? post.media?.[0]?.url)
+    .filter(Boolean)
 
   return (
     <>
