@@ -27,7 +27,7 @@ import { EmailAuthorButton as EmailAuthorButton_a6b2521e62d49d84215a45532ebcc5f0
 import { PostsStatusTabs as PostsStatusTabs_8893cba97283db71af302b1631966189 } from '../../../components/admin/PostsStatusTabs'
 import { ColorPaletteField as ColorPaletteField_fe30c039191aeae9cb45d51324009ae2 } from '../../../fields/ColorPaletteField'
 import { Logo as Logo_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
-import { VercelBlobClientUploadHandler as VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e } from '@payloadcms/storage-vercel-blob/client'
+import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -61,6 +61,6 @@ export const importMap = {
   "/components/admin/PostsStatusTabs#PostsStatusTabs": PostsStatusTabs_8893cba97283db71af302b1631966189,
   "/fields/ColorPaletteField#ColorPaletteField": ColorPaletteField_fe30c039191aeae9cb45d51324009ae2,
   "/components/admin/Logo#Logo": Logo_91a09b539d3c86b0aebf520e7564ce08,
-  "@payloadcms/storage-vercel-blob/client#VercelBlobClientUploadHandler": VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e,
+  "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

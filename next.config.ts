@@ -16,6 +16,12 @@ const nextConfig: NextConfig = {
         pathname: '/images/**',
       },
     ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'media.praxisasitis.net',
+      },
+    ],
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
