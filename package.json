@@ -22,7 +22,8 @@
     "@payloadcms/db-postgres": "3.88.0",
     "@payloadcms/next": "3.88.0",
     "@payloadcms/richtext-lexical": "3.88.0",
-    "@payloadcms/storage-vercel-blob": "^3.88.0",
+    "@payloadcms/storage-s3": "3.88.0",
+    "@payloadcms/storage-vercel-blob": "3.88.0",
     "@payloadcms/ui": "3.88.0",
     "@tailwindcss/postcss": "^4.3.3",
     "cross-env": "^7.0.3",
@@ -70,6 +71,9 @@
       "sharp",
       "esbuild",
       "unrs-resolver"
-    ]
+    ],
+    "overrides": {
+      "sharp": "0.34.2"
+    }
   }
 }
