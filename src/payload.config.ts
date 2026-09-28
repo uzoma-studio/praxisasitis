@@ -4,7 +4,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
-import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
+import { s3Storage } from '@payloadcms/storage-s3'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -53,13 +53,34 @@ export default buildConfig({
   sharp,
 
   plugins: [
-    vercelBlobStorage({
-      enabled: true,
+    s3Storage({
       collections: {
-        [Media.slug]: true,
+        [Media.slug]: {
+          // Serve straight from the R2 custom domain instead of proxying through Payload
+          disablePayloadAccessControl: true,
+          generateFileURL: ({
+            filename: fileName,
+            prefix,
+          }: {
+            filename: string
+            prefix?: string
+          }) =>
+            [process.env.R2_PUBLIC_URL, prefix, encodeURIComponent(fileName)]
+              .filter(Boolean)
+              .join('/'),
+        },
       },
-      token: process.env.BLOB_READ_WRITE_TOKEN,
+      bucket: process.env.R2_BUCKET || '',
       clientUploads: true,
+      config: {
+        endpoint: process.env.R2_ENDPOINT, // https://<ACCOUNT_ID>.r2.cloudflarestorage.com
+        region: 'auto',
+        credentials: {
+          accessKeyId: process.env.R2_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
+        },
+        forcePathStyle: true,
+      },
     }),
   ],
 })
