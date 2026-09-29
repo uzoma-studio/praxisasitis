@@ -22,8 +22,30 @@ const helveticaNeue = localFont({
 })
 
 export const metadata = {
+  metadataBase: new URL('https://www.praxisasitis.net'),
   title: 'Praxis As It Is',
   description: 'A living record of grassroots organising in Nigeria.',
+  openGraph: {
+    title: 'Praxis As It Is',
+    description: 'A living record of grassroots organising in Nigeria.',
+    url: 'https://www.praxisasitis.net',
+    siteName: 'Praxis As It Is',
+    images: [
+      {
+        url: '/images/Ngimg.png',
+        width: 1080,
+        height: 1080,
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Praxis As It Is',
+    description: 'A living record of grassroots organising in Nigeria.',
+    images: ['/images/Ngimg.png'],
+  },
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
