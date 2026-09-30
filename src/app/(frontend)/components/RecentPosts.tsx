@@ -24,7 +24,7 @@ const TAB_W = 280 // width of the flat plateau
 const GAP = 44 // baseline distance between adjacent tabs
 const EDGE_GAP = 72 // baseline run-in/run-out at the very start and end of a row — wider than GAP
 const START_PAD = EDGE_GAP
-const ROW_H = 90 // row height
+const ROW_H = 110 // row height (taller so long titles fit inside the tab)
 const Y_TOP = 6 // plateau y (small inset so stroke isn't clipped)
 const Y_BASE = ROW_H - 6 // baseline y
 const HOVER_LIFT = 8 // how much higher the hovered tab's plateau sits, in SVG units
@@ -204,7 +204,7 @@ function TabRow({
                   className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
                   style={{ backgroundColor: post.issueTags?.[0]?.color ?? '#999' }}
                 />
-                <span className="font-mono lg:text-sm text-base font-bold leading-tight">
+                <span className="line-clamp-4 font-mono text-sm font-bold leading-tight">
                   {post.title}
                 </span>
               </div>
