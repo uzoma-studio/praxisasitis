@@ -257,7 +257,7 @@ export function FeaturedStories({ posts }: { posts: Post[] }) {
                     cardRefs.current[i] = el
                   }}
                   onClick={() => setCurrent(i)}
-                  className={` relative flex cursor-pointer h-30 w-full flex-col items-start justify-between p-4 text-left transition-colors md:h-auto md:min-w-[33.333%] md:w-[33.333%] md:flex-col md:justify-between md:p-6 ${
+                  className={`relative flex cursor-pointer min-h-40 w-full flex-col items-start justify-between p-4 text-left transition-colors md:h-auto md:min-w-[33.333%] md:w-[33.333%] md:flex-col md:justify-between md:p-6 ${
                     isLast
                       ? 'border-b-0 md:border-b-0 md:border-r-0'
                       : 'border-b border-ink md:border-b-0 md:border-r'
