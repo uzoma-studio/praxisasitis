@@ -57,6 +57,62 @@ function formatSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
+// Gives every upload a unique name so two files can never collide,
+// even when they're uploaded at the same moment or retried.
+function uniqueFile(file: File) {
+  const dot = file.name.lastIndexOf('.')
+  const base = dot > 0 ? file.name.slice(0, dot) : file.name
+  const ext = dot > 0 ? file.name.slice(dot) : ''
+  const safe = base.replace(/[^\w-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'upload'
+
+  return new File([file], `${safe}-${crypto.randomUUID().slice(0, 8)}${ext}`, {
+    type: file.type,
+  })
+}
+
+async function uploadFile(file: File, attempt = 0): Promise<string> {
+  const data = new FormData()
+
+  data.append('file', uniqueFile(file))
+  data.append('_payload', JSON.stringify({ alt: file.name.replace(/\.[^/.]+$/, '') }))
+
+  let response: Response
+
+  try {
+    response = await fetch('/api/media', { method: 'POST', body: data })
+  } catch {
+    // Network-level failure ("Failed to fetch"): retry twice before giving up
+    if (attempt < 2) return uploadFile(file, attempt + 1)
+
+    throw new Error(
+      `Network problem while uploading ${file.name}. Check your connection and try again.`,
+    )
+  }
+
+  const result = await response.json().catch(() => null)
+
+  if (!response.ok) {
+    console.error('Media upload failed:', result)
+    throw new Error(
+      result?.errors?.[0]?.message || result?.message || `Could not upload ${file.name}`,
+    )
+  }
+
+  return result.doc.id as string
+}
+
+// Sequential on purpose: avoids filename races and keeps weak mobile
+// connections from juggling ten uploads at once.
+async function uploadFiles(files: File[]) {
+  const ids: string[] = []
+
+  for (const file of files) {
+    ids.push(await uploadFile(file))
+  }
+
+  return ids
+}
+
 export function AddPostForm({ tags }: { tags: Tag[] }) {
   const locationDescriptionRef = useRef<HTMLInputElement>(null)
 
@@ -180,39 +236,6 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
     }
   }
 
-  async function uploadFiles(files: File[]) {
-    return Promise.all(
-      files.map(async (file) => {
-        const data = new FormData()
-
-        data.append('file', file)
-
-        data.append(
-          '_payload',
-          JSON.stringify({
-            alt: file.name.replace(/\.[^/.]+$/, ''),
-          }),
-        )
-
-        const response = await fetch('/api/media', {
-          method: 'POST',
-          body: data,
-        })
-
-        const result = await response.json()
-
-        if (!response.ok) {
-          console.error('Media upload failed:', result)
-          throw new Error(
-            result?.errors?.[0]?.message || result?.message || `Could not upload ${file.name}`,
-          )
-        }
-
-        return result.doc.id as string
-      }),
-    )
-  }
-
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const formElement = event.currentTarget
@@ -240,10 +263,8 @@ export function AddPostForm({ tags }: { tags: Tag[] }) {
     setIsSubmitting(true)
 
     try {
-      const [coverIds, mediaIds] = await Promise.all([
-        uploadFiles(coverFile ? [coverFile] : []),
-        uploadFiles(mediaFiles),
-      ])
+      const coverIds = await uploadFiles(coverFile ? [coverFile] : [])
+      const mediaIds = await uploadFiles(mediaFiles)
 
       const response = await fetch('/api/post-submissions', {
         method: 'POST',
